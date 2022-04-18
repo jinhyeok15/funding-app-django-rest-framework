@@ -25,5 +25,5 @@ urlpatterns = [
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     re_path(r'^admin/', admin.site.urls),
     path('shop/', include('funding.apps.shop.urls')),
-    path('user/', include('funding.apps.profile.urls')),
+    path('accounts/', include('funding.apps.profile.urls')),
 ]
