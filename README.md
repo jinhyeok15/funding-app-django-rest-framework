@@ -22,6 +22,13 @@ pip install -r requirements.txt
 python manage.py runserver
 ```
 
+## Swagger 문서 자동화
+[참고](https://github.com/axnsan12/drf-yasg)
+
+### Connect
+127.0.0.1:8000/swagger
+127.0.0.1:8000/redoc
+
 ## Commit 관련 정리
 * [DBG] 디버그
 * [API] API 개발
