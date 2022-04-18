@@ -26,11 +26,11 @@ python manage.py runserver
 [참고](https://github.com/axnsan12/drf-yasg)
 
 ### Connect
-127.0.0.1:8000/swagger
+127.0.0.1:8000/swagger\
 127.0.0.1:8000/redoc
 
 ## TestCase
-[django test](https://docs.djangoproject.com/en/4.0/topics/testing/overview/)
+[django test](https://docs.djangoproject.com/en/4.0/topics/testing/overview/)\
 [drf test](https://www.django-rest-framework.org/api-guide/testing/)
 
 ```python manage.py test```
