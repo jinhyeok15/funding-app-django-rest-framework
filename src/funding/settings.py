@@ -37,6 +37,7 @@ DEBUG = CONF['DEBUG'].lower() in ('on', 'true', 'y', 'yes')
 
 ALLOWED_HOSTS = ['*']
 
+AUTH_USER_MODEL = 'profile.User'
 
 # Application definition
 
@@ -48,6 +49,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # apps
+    'funding.apps.profile',
+    'funding.apps.shop',
 )
 
 MIDDLEWARE = [
