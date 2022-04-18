@@ -29,6 +29,12 @@ python manage.py runserver
 127.0.0.1:8000/swagger
 127.0.0.1:8000/redoc
 
+## TestCase
+[django test](https://docs.djangoproject.com/en/4.0/topics/testing/overview/)
+[drf test](https://www.django-rest-framework.org/api-guide/testing/)
+
+```python manage.py test```
+
 ## Commit 관련 정리
 * [DBG] 디버그
 * [API] API 개발
