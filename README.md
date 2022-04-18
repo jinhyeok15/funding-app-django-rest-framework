@@ -1,12 +1,12 @@
 # 원티드러닝 프리온보딩 백엔드 2차 코스 지원 과제
 
 ## Stack
-Python 3.7
-Django 2.1.7
-DRF 3.11.0
-postgresql(RDS)
-Docker v18.09.2
-Docker Compose v1.23.2
+* Python 3.7
+* Django 2.1.7
+* DRF 3.11.0
+* postgresql(RDS)
+* Docker v18.09.2
+* Docker Compose v1.23.2
 
 ## Work Logs
 [click here](doc/work.md)
