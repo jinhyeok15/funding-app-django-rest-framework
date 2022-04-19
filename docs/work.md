@@ -17,3 +17,5 @@
 + 상품 등록 test case 작성
 + 서비스 분석 부분 추가 && md 파일 구조 수정
 - view 설계
+- Pocket model 생성
+- User 등록시 Pocket 자동 생성
