@@ -14,6 +14,6 @@
 
 - 과제 분석
 + model 구조 설계
-- test case 작성
++ 상품 등록 test case 작성
 + 서비스 분석 부분 추가 && md 파일 구조 수정
 - view 설계
