@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     # apps
     'funding.apps.profile',
     'funding.apps.shop',
+    'funding.apps.abstract',
 )
 
 MIDDLEWARE = [

@@ -50,3 +50,7 @@ python manage.py runserver
 * [RFC] 리팩토링
 * [ENV] 환경 설정
 * [DOC] 문서 관련 정리
+
+### git commit convention
+
+[https://www.conventionalcommits.org/en/v1.0.0/](https://www.conventionalcommits.org/en/v1.0.0/)
