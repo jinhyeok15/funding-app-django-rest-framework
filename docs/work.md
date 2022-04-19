@@ -1,5 +1,7 @@
 # Logs
+
 ## 4.18
+
 + 환경세팅 및 MarkDown 정리
 + RDS 설정
 + S3 conf.ini 업로드
@@ -9,6 +11,8 @@
 + app 올리기 +profile +user && model 작성하기 => User
 
 ## 4.19
+
 - 과제 분석
 - shop models 작성
 - test case 작성
+- 서비스 분석 부분 추가 && md 파일 구조 수정
