@@ -11,11 +11,12 @@
   3. Swagger django 연동
   4. TestCase 설정
 * APIS
-  1. account/signup
-  2. 상품 등록
-  3. 상품 수정
-  4. 상품 삭제
-  5. 상품 목록 조회
+  1. POST account/signup/
+  2. POST shop/post/
+  3. PATCH shop/post/:post_id/
+  4. DELETE shop/post/:post_id/
+  5. GET shop/post/:post_id
+  6. GET shop/posts/
 
 ## 개요
 
@@ -103,6 +104,29 @@ Connect
 
 ## API 구축
 
-### 1. account/signup
+### 1. POST account/signup
 
 [참고: How to Implement Token Authentication using Django REST Framework](https://simpleisbetterthancomplex.com/tutorial/2018/11/22/how-to-implement-token-authentication-using-django-rest-framework.html)
+
+* RequestBody(required)
+
+```json
+{
+    "username": "진혁이",
+    "email": "fhfhfh@email.com",
+    "password": "12345678"
+}
+```
+
+* Response(200)
+* Response(400)
+
+### 2. POST shop/post/:post_id/
+
+### 3. PATCH shop/post/:post_id/
+
+### 4. DELETE shop/post/:post_id/
+
+### 5. GET shop/post/:post_id/
+
+### 6. GET shop/posts/
