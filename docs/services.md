@@ -121,7 +121,7 @@ Connect
 * Response(200)
 * Response(400)
 
-### 2. POST shop/post/:post_id/
+### 2. POST shop/post/
 
 ### 3. PATCH shop/post/:post_id/
 
