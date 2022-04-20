@@ -4,9 +4,7 @@
 
 ### [Work Logs](docs/work.md)
 
-### [서비스 분석](docs/services.md)
-
-### [구현](docs/impl.md)
+### [서비스 분석 및 구현](docs/services.md)
 
 ## Commit 관련 정리
 
