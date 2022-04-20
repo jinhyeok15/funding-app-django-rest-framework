@@ -22,6 +22,10 @@
 + POST shop/post/
 
 ## 4.21
+- authentification mixin설계
+- abstract -> core로 변경
+- abstract/models 모듈 구분 abstract/interface/dummy
+- views class 명 뒤에 View 붙이기
 - signin API
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id
