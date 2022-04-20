@@ -4,6 +4,9 @@ from . import views
 
 urlpatterns = [
     path('auth/', include(([
-        path('token/generate', obtain_auth_token, name='api_token_auth')
-    ], 'user'), namespace='auth'))
+        path('token/', obtain_auth_token, name='api_token_auth')
+    ], 'user'), namespace='auth')),
+    path('account/', include(([
+        path('signup/', views.AccountCreate.as_view(), name='user_login')
+    ], 'user'), namespace='account'))
 ]

@@ -19,3 +19,7 @@
 ### git commit convention
 
 [https://www.conventionalcommits.org/en/v1.0.0/](https://www.conventionalcommits.org/en/v1.0.0/)
+
+## Apply swagger schema
+
+[https://drf-yasg.readthedocs.io/en/stable/custom_spec.html](https://drf-yasg.readthedocs.io/en/stable/custom_spec.html)
