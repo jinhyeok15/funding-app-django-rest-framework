@@ -22,3 +22,11 @@ class UserAPITests(TestCase):
             }
         )
         self.assertEqual(response.status_code, 201)
+        response = c.post(
+            '/account/signup/', {
+                'username': '진혁 이',
+                'email': 'fhfhfh@email.com',
+                'password': '12345678'
+            }
+        )
+        self.assertEqual(response.status_code, 400)
