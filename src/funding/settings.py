@@ -37,7 +37,7 @@ DEBUG = CONF['DEBUG'].lower() in ('on', 'true', 'y', 'yes')
 
 ALLOWED_HOSTS = ['*']
 
-AUTH_USER_MODEL = 'profile.User'
+AUTH_USER_MODEL = 'user.User'
 
 # Application definition
 
@@ -48,12 +48,23 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third-Party Apps
     'drf_yasg',
+    'rest_framework',
+    'rest_framework.authtoken',
+
     # apps
-    'funding.apps.profile',
+    'funding.apps.user',
     'funding.apps.shop',
     'funding.apps.abstract',
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -63,3 +63,7 @@ Connect
 ### 1. apps
 
 앱은 유저 관련 info를 처리하는 profile과 펀딩 샵 부분을 담당하는 shop이 있습니다. 펀딩 샵과 다른 도메인 간의 재사용성을 고려하여, 일부 django 객체 및 components는 abstract 앱에서 관리합니다.
+
+### 2. 로그인 구현
+
+[참고: How to Implement Token Authentication using Django REST Framework](https://simpleisbetterthancomplex.com/tutorial/2018/11/22/how-to-implement-token-authentication-using-django-rest-framework.html)

@@ -1,6 +1,6 @@
 from tkinter import CASCADE
 from django.db import models
-from funding.apps.profile.models import User
+from funding.apps.user.models import User
 
 
 class Post(models.Model):
