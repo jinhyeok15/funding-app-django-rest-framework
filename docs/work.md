@@ -18,7 +18,7 @@
 + Pocket model 생성 && User 등록시 Pocket 자동 생성
 + signup API
 - signin API
-- POST shop/post/:post_id
++ POST shop/post/
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id
 - GET shop/posts/

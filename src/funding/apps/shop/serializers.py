@@ -32,11 +32,10 @@ class PostCreateSerializer(ModelSerializer):
         ]
 
 
-class ItemSerializer(ModelSerializer):
+class ItemCreateSerializer(ModelSerializer):
 
     class Meta:
         model = Item
         fields = [
-            'tag', 'price', 'target_amount', 'updated_at'
+            'price', 'target_amount'
         ]
-        read_only_fields = ['target_amount', 'updated_at']
