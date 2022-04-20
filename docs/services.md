@@ -4,7 +4,7 @@
 
 * 서비스 분석
   1. 개요
-  2. 요구사항
+  2. ~요구사항 => APIS와 병합~
 * 환경 세팅하기
   1. 서버 환경 (stacks)
   2. 로컬 실행
@@ -33,7 +33,6 @@
 ```python
 # apps/abstract/models
 
-from tkinter import CASCADE
 from django.db import models
 from funding.apps.user.models import User
 
@@ -57,6 +56,14 @@ class PurchaseInterface(models.Model):
     class Meta:
         abstract = True
 
+
+class AbstractPostItem(models.Model):
+    title: models.CharField
+    poster_name: models.CharField
+    final_date: models.CharField
+    content: models.TextField
+    target_amount: models.IntegerField
+    price: models.IntegerField
 ```
 
 ## 환경 세팅하기
@@ -147,16 +154,20 @@ Connect
 ```json
 {
     "post_id": 1,
-    "poster": {
-        // User.objects
-    },
-    "item": {
-        // Item.objects
-    }
+    "poster": 2,
+    "item": 4
 }
 ```
 
 * Response(400)
+
+* Description
+
+게시자가 Item과 관련한 게시물을 작성한다는 점을 고려하여, Item과 Post 관련한 부분을 분리하였습니다. Funding shop 도메인에서는 Item이 핵심인 게시물이겠지만, 이후 커뮤니티로 발전할 경우와 같은 게시물의 확장성을 고려하였습니다. 이렇게 될 경우, 단순히 게시물을 CREATE하는 API가 아닌, 게시자가 Item을 먼저 등록한 후 이를 게시한다는 논리 구조가 형성됩니다. 이를 View에서 비즈니스 로직으로 구현하기 위해 두 개의 테이블에 접근하여 create하는 트랜잭션을 관리할 세션을 django.db.transaction 모듈을 통해 생성하였습니다.  
+
+또한 request.data를 validation할 PostItemSerializer의 경우, AbstractPostItem model을 받아서 기존 모델(Item, ShopPost)와 형식이 맞지 않아 에러가 나는 부분을 해결했습니다.  
+
+response에서는 client에서 사용할 게시물 id와 게시자 id, item id를 제공하여 client 측에서 접근할 수 있도록 하였습니다.
 
 ### 3. PATCH shop/post/:post_id/
 
