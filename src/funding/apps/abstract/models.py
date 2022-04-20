@@ -22,7 +22,7 @@ class PurchaseInterface(models.Model):
         abstract = True
 
 
-class AbstractShopPost(models.Model):
+class AbstractPostItem(models.Model):
     title: models.CharField
     poster_name: models.CharField
     final_date: models.CharField
