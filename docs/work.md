@@ -16,9 +16,13 @@
 + 상품 등록 test case 작성
 + 서비스 분석 부분 추가 && md 파일 구조 수정
 + Pocket model 생성 && User 등록시 Pocket 자동 생성
+
+## 4.20
 + signup API
-- signin API
 + POST shop/post/
+
+## 4.21
+- signin API
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id
 - GET shop/posts/
