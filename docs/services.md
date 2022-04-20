@@ -123,6 +123,41 @@ Connect
 
 ### 2. POST shop/post/
 
+* Header(required)
+
+```json
+{"Authorization": "Token {your token}"}
+```
+
+* RequestBody(required)
+
+```json
+{
+    "title": "안녕하세요",
+    "poster_name": "제 이름은",
+    "content": "djfjfjfjfjfjd",
+    "target_amount": 10000000,
+    "final_date": "2022-04-22",
+    "price": 500000
+}
+```
+
+* Response(200)
+
+```json
+{
+    "post_id": 1,
+    "poster": {
+        // User.objects
+    },
+    "item": {
+        // Item.objects
+    }
+}
+```
+
+* Response(400)
+
 ### 3. PATCH shop/post/:post_id/
 
 ### 4. DELETE shop/post/:post_id/
