@@ -8,17 +8,19 @@ from rest_framework.permissions import IsAuthenticated
 # 트랜잭션 참조
 # https://docs.djangoproject.com/en/3.0/topics/db/transactions/#django.db.transaction.atomic
 from django.db import transaction
-from funding.apps.core.views.mixins import AuthMixin
+from django.core.exceptions import ValidationError
+from funding.apps.core.views import IntegrationMixin
 
 
-class PostItem(AuthMixin, GenericAPIView):
+class PostItemView(IntegrationMixin, GenericAPIView):
     serializer_class = PostItemSerializer
     permission_classes = [IsAuthenticated]
 
     @transaction.atomic()
     def post(self, request, *args, **kwargs):
-        serializer = PostItemSerializer(data=request.data)
-        if serializer.is_valid() is False:
+        try:
+            serializer = self.get_valid_szr(PostItemSerializer, data=request.data)
+        except ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # request로 부터 header를 가져와서 User obj 가져오기
@@ -30,26 +32,29 @@ class PostItem(AuthMixin, GenericAPIView):
 
         # create session
         sid = transaction.savepoint()
-        item_serializer = ItemCreateSerializer(data={
-            'price': request.data['price'],
-            'target_amount': request.data['target_amount']
-        })
-        if item_serializer.is_valid() is False:
-            return Response(item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        item = item_serializer.save()
+        try:
+            serializer = self.get_valid_szr(
+                ItemCreateSerializer, data={
+                    'price': request.data['price'],
+                    'target_amount': request.data['target_amount']
+                }
+            )
+            item = serializer.save()
 
-        post_serializer = PostCreateSerializer(data={
-            'item': item.id,
-            'poster': poster_id,
-            'title': request.data['title'],
-            'content': request.data['content'],
-            'poster_name': request.data['poster_name'],
-            'final_date': request.data['final_date']
-        })
-        if post_serializer.is_valid() is False:
+            serializer = self.get_valid_szr(
+                PostCreateSerializer, data={
+                    'item': item.id,
+                    'poster': poster_id,
+                    'title': request.data['title'],
+                    'content': request.data['content'],
+                    'poster_name': request.data['poster_name'],
+                    'final_date': request.data['final_date']
+                }
+            )
+            post = serializer.save()
+        except ValidationError:
             transaction.savepoint_rollback(sid)
-            return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        post = post_serializer.save()
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # end session
         transaction.savepoint_commit(sid)
 

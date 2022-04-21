@@ -18,15 +18,21 @@
 + Pocket model 생성 && User 등록시 Pocket 자동 생성
 
 ## 4.20
+
 + signup API
 + POST shop/post/
 
 ## 4.21
+
 + authentification mixin 설계
 + abstract -> core로 변경
 + core/models 모듈 구분 abstract/interface/dummy
-- serializer validation mixin 설계 -> django ValidationError로 validate 할 수 있도록
-- views class 명 뒤에 View 붙이기
++ serializer validation mixin 설계 -> django ValidationError로 validate 할 수 있도록
++ views class 명 뒤에 View 붙이기
+
+## 4.22
+
+- Response 관련 core view 설계
 - signin API
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id

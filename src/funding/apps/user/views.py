@@ -7,7 +7,7 @@ from .serializers import AccountCreateSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
-class AccountCreate(CreateAPIView):
+class AccountCreateView(CreateAPIView):
     permission_classes = [AllowAny]
     queryset = User.objects.all()
     serializer_class = AccountCreateSerializer
