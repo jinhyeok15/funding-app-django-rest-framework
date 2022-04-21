@@ -5,13 +5,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authtoken.models import Token
 # 트랜잭션 참조
 # https://docs.djangoproject.com/en/3.0/topics/db/transactions/#django.db.transaction.atomic
 from django.db import transaction
+from funding.apps.core.views.mixins import AuthMixin
 
 
-class PostItem(GenericAPIView):
+class PostItem(AuthMixin, GenericAPIView):
     serializer_class = PostItemSerializer
     permission_classes = [IsAuthenticated]
 
@@ -26,9 +26,7 @@ class PostItem(GenericAPIView):
         # PostCreateSerializer를 생성하고, validation 진행 후 save한다.
         # Response 데이터로 post_id, user, item을 반환한다.
 
-        token_key = request.META['HTTP_AUTHORIZATION'].split(" ")[1]
-        token = Token.objects.get(key=token_key)
-        poster_id = token.user_id
+        poster_id = self.get_auth_user(request)
 
         # create session
         sid = transaction.savepoint()

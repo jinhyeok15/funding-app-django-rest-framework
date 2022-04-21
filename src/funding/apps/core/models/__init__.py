@@ -1,3 +1,3 @@
-from .abstract import Post
-from .dummy import PostItemModel
-from .interface import PurchaseInterface
+from .abstracts import Post
+from .dummies import PostItemModel
+from .interfaces import PurchaseInterface

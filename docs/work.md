@@ -22,9 +22,10 @@
 + POST shop/post/
 
 ## 4.21
-- authentification mixin설계
-- abstract -> core로 변경
-- abstract/models 모듈 구분 abstract/interface/dummy
++ authentification mixin 설계
++ abstract -> core로 변경
++ core/models 모듈 구분 abstract/interface/dummy
+- serializer validation mixin 설계 -> django ValidationError로 validate 할 수 있도록
 - views class 명 뒤에 View 붙이기
 - signin API
 - PATCH shop/post/:post_id
