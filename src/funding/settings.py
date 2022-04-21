@@ -57,7 +57,7 @@ INSTALLED_APPS = (
     # apps
     'funding.apps.user',
     'funding.apps.shop',
-    'funding.apps.abstract',
+    'funding.apps.core',
 )
 
 REST_FRAMEWORK = {

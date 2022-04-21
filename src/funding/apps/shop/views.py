@@ -4,7 +4,6 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
-from .models import *
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 # 트랜잭션 참조
@@ -16,7 +15,7 @@ class PostItem(GenericAPIView):
     serializer_class = PostItemSerializer
     permission_classes = [IsAuthenticated]
 
-    @transaction.atomic
+    @transaction.atomic()
     def post(self, request, *args, **kwargs):
         serializer = PostItemSerializer(data=request.data)
         if serializer.is_valid() is False:

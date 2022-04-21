@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from .models import *
-from funding.apps.abstract.models import AbstractPostItem
+from funding.apps.core.models import PostItemModel
 
 
 # It is to use optain request set in PostItemView
@@ -14,7 +14,7 @@ class PostItemSerializer(ModelSerializer):
     price = serializers.IntegerField()
 
     class Meta:
-        model = AbstractPostItem
+        model = PostItemModel
         fields = '__all__'
 
 

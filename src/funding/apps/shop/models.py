@@ -1,6 +1,6 @@
 from django.db import models
 from funding.apps.user.models import User
-from funding.apps.abstract.models import Post, PurchaseInterface
+from funding.apps.core.models import Post, PurchaseInterface
 
 
 class Item(models.Model):
