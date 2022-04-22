@@ -32,7 +32,17 @@
 
 ## 4.22
 
-- Response 관련 core view 설계
++ Response 관련 core view 설계
++ PostItemView -> ShopPostItemView 변경
+
+## 4.23
+
+- docs 정리 및 주석 구체화
+- HttpStatus message Enum 설계
+- user view refactoring
+- POST shop/post v1.0.0 update
+- test refactoring
+
 - signin API
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id

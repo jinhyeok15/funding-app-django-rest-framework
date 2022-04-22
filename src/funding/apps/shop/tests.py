@@ -29,4 +29,4 @@ class ShopAPITests(TestCase):
             'final_date': '2022-04-26',  # component에서 DateCpnt로 date 유효성 검사
             'price': 15000
         }, format='json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
