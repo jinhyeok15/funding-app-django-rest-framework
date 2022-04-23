@@ -5,7 +5,7 @@ from typing import Optional
 
 __all__ = [
         'HttpStatus',
-        'InheritedResponse',
+        'GenericResponse',
         ]
 
 
@@ -22,19 +22,18 @@ class HttpStatus:
     """
     rest_framework status의 status code 기반으로 status와 code, custom message를 갖고 있는 object
     """
-    def __init__(self, code, message=None, error=None, schema=None):
+    def __init__(self, code, message=None, error=None):
         self.code = code
         self.status = _get_status_by_code(code)
         self.message = message
         if error is not None:
             self.message = error.args[0] + "\n" + self.message if self.message is not None else error.args[0]
             self.errors = error.args[1]
-        self.schema = schema
 
 
-class InheritedResponse(Response):
+class GenericResponse(Response):
     """
-    import InheritedResponse as Response\n
+    import GenericResponse as Response\n
     Response 객체를 받아서 data형식에 맞게 변환시켜 전달한다\n
     생성자 인자로는 data와 HttpStatus를 받는다. -> Response(data, HttpStatus(400))\n
     기존 Response 객체와 유사하게 사용하여도 된다. (추천 사항은 아님) -> Response(data={}, status=status.HTTP_200_OK)\n

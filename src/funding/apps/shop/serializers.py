@@ -4,7 +4,7 @@ from .models import *
 from funding.apps.core.models import PostItemModel
 
 
-# It is to use optain request set in PostItemView
+# It is to use optain request set in ShopPostItemView
 class ShopPostItemSerializer(ModelSerializer):
     title = serializers.CharField()
     poster_name = serializers.CharField()

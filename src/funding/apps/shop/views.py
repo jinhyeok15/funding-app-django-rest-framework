@@ -2,6 +2,7 @@
 # https://stackoverflow.com/questions/42311888/django-rest-swagger-apiview
 from rest_framework.generics import GenericAPIView
 from .serializers import *
+from .schemas import *
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 # 트랜잭션 참조
 # https://docs.djangoproject.com/en/3.0/topics/db/transactions/#django.db.transaction.atomic
@@ -9,7 +10,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from funding.apps.core.views import (
     IntegrationMixin,
-    InheritedResponse as Response, HttpStatus
+    GenericResponse as Response, HttpStatus
 )
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -39,17 +40,7 @@ class ShopPostItemView(IntegrationMixin, GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        request_body=ShopPostItemSerializer,
-        manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="유저 토큰 -> Token {your token}", type=openapi.TYPE_STRING)],
-        responses={201: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "post_id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                "poster": openapi.Schema(type=openapi.TYPE_INTEGER),
-                "item": openapi.Schema(type=openapi.TYPE_INTEGER)
-            }
-        ),
-        400: "serializer 에러"}
+        **shop_post_item_logic
     )
     @transaction.atomic()
     def post(self, request, *args, **kwargs):
