@@ -5,7 +5,7 @@ from funding.apps.core.models import PostItemModel
 
 
 # It is to use optain request set in PostItemView
-class PostItemSerializer(ModelSerializer):
+class ShopPostItemSerializer(ModelSerializer):
     title = serializers.CharField()
     poster_name = serializers.CharField()
     final_date = serializers.CharField()
@@ -18,7 +18,7 @@ class PostItemSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class PostCreateSerializer(ModelSerializer):
+class ShopPostCreateSerializer(ModelSerializer):
 
     class Meta:
         model = ShopPost

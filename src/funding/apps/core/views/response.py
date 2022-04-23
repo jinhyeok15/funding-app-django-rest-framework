@@ -22,13 +22,14 @@ class HttpStatus:
     """
     rest_framework status의 status code 기반으로 status와 code, custom message를 갖고 있는 object
     """
-    def __init__(self, code, message=None, error=None):
+    def __init__(self, code, message=None, error=None, schema=None):
         self.code = code
         self.status = _get_status_by_code(code)
         self.message = message
         if error is not None:
             self.message = error.args[0] + "\n" + self.message if self.message is not None else error.args[0]
             self.errors = error.args[1]
+        self.schema = schema
 
 
 class InheritedResponse(Response):

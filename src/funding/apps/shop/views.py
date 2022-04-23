@@ -11,6 +11,8 @@ from funding.apps.core.views import (
     IntegrationMixin,
     InheritedResponse as Response, HttpStatus
 )
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class ShopPostItemView(IntegrationMixin, GenericAPIView):
@@ -33,13 +35,26 @@ class ShopPostItemView(IntegrationMixin, GenericAPIView):
 
     response에서는 client에서 사용할 게시물 id와 게시자 id, item id를 제공하여 client 측에서 접근할 수 있도록 하였습니다.
     """
-    serializer_class = PostItemSerializer
+
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=ShopPostItemSerializer,
+        manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="유저 토큰 -> Token {your token}", type=openapi.TYPE_STRING)],
+        responses={201: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "post_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "poster": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "item": openapi.Schema(type=openapi.TYPE_INTEGER)
+            }
+        ),
+        400: "serializer 에러"}
+    )
     @transaction.atomic()
     def post(self, request, *args, **kwargs):
         try:
-            serializer = self.get_valid_szr(PostItemSerializer, data=request.data)
+            serializer = self.get_valid_szr(ShopPostItemSerializer, data=request.data)
         except ValidationError as e:
             return Response(None, HttpStatus(400, error=e))
 
@@ -57,7 +72,7 @@ class ShopPostItemView(IntegrationMixin, GenericAPIView):
             item = serializer.save()
 
             serializer = self.get_valid_szr(
-                PostCreateSerializer, data={
+                ShopPostCreateSerializer, data={
                     'item': item.id,
                     'poster': poster_id,
                     'title': request.data['title'],

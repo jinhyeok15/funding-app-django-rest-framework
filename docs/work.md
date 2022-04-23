@@ -43,6 +43,7 @@
 - POST shop/post v1.0.0 update
 - test refactoring
 - RDS 한국 서버 시간으로 적용시키기
+- pydantic.BaseModel로 request와 response schema 관리, swagger에 BaseModel 적용
 
 - signin API
 - PATCH shop/post/:post_id
