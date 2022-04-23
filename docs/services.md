@@ -10,25 +10,33 @@
   2. 로컬 실행
   3. Swagger django 연동
   4. TestCase 설정
-* APIS
-  1. POST account/signup/
-  2. POST shop/post/
-  3. PATCH shop/post/:post_id/
-  4. DELETE shop/post/:post_id/
-  5. GET shop/post/:post_id
-  6. GET shop/posts/
+* API 구축
+  1. [POST account/signup/](#1-post-accountsignup)
+  2. [POST shop/post/](#2-post-shoppost-v100)
+  3. [PATCH shop/post/:post_id/](#3-patch-shoppostpost_id)
+  4. [DELETE shop/post/:post_id/](#4-delete-shoppostpost_id)
+  5. [GET shop/post/:post_id](#5-get-shoppostpost_id)
+  6. [GET shop/posts/](#6-get-shopposts)
 
-## 개요
+## 서비스 분석
+
+### 1. 개요
 
 * User type: 일반유저/게시자
+
 * 유저는 상품을 1회까지만 펀딩할 수 있다.
+
 * 유저는 결제할 수 있는 Pocket을 등록한 후 purchase할 수 있다.
+
 * ShopPost에는 status=SUCCESS/DONATE/CANCEL/CLOSE 컬럼이 존재한다. PURCHASE는 펀딩이 성공적으로 진행되어 상품 준비단계까지 진행된 상태이며, DONATE는 펀딩에 참여하였으나 마감일이 끝나지 않은 상태, CANCEL은 펀딩을 취소한 상태, CLOSE는 펀딩 목표 금액을 넘지 못하여 펀딩이 취소된 상태를 의미한다. 결제는 DONATE단계에서 진행되며, CANCEL이 되면 결제 내역이 환불된다.
+
 * 펀딩 shop 도메인에서 결제부분을 따로 빼는 것을 고려하였으나, 기존 앱에서 펀딩 shop 도메인을 추가하는 것이라면 shop 내부에서 purchase 내역을 관리하는 것이 좋을 것으로 판단하였음
+
 * ShopPurchaseLog에서 User, Item을 UniqueConstraint로 묶어서 관리해야 한다.(유저가 한개의 상품에 여러번 DONATE 불가능) 하지만 현재 Django 버전이 2.1.7로 UniqueConstraint는 공식문서에서 4.0 버전에서 다루는 것을 추천한다. 대안책으로 모델에서 post를 할 경우 get_or_create를 활용한다.
+
 * 앱은 유저 관련 info를 처리하는 profile과 펀딩 샵 부분을 담당하는 shop이 있습니다. 펀딩 샵과 다른 도메인 간의 재사용성을 고려하여, 일부 django 객체 및 components는 abstract 앱에서 관리합니다.
 
-### abstract model
+> abstract model
 
 ```python
 # apps/abstract/models
@@ -66,7 +74,7 @@ class AbstractPostItem(models.Model):
     price: models.IntegerField
 ```
 
-## 환경 세팅하기
+## 2. 환경 세팅하기
 
 ### 1. 서버 환경 (stacks)
 
@@ -109,7 +117,7 @@ Connect
 
 ```python manage.py test```
 
-## API 구축
+## 3. API 구축
 
 ### 1. POST account/signup
 
@@ -128,7 +136,7 @@ Connect
 * Response(200)
 * Response(400)
 
-### 2. POST shop/post/
+### 2. POST shop/post/ v1.0.0
 
 * Header(required)
 
@@ -153,13 +161,31 @@ Connect
 
 ```json
 {
-    "post_id": 1,
-    "poster": 2,
-    "item": 4
+    "code": 201,
+    "status": "HTTP_201_CREATED",
+    "message": "생성완료",
+    "data": {
+        "post_id": 5,
+        "poster": 2,
+        "item": 13
+    }
 }
 ```
 
 * Response(400)
+
+```json
+{
+    "code": 400,
+    "status": "HTTP_400_BAD_REQUEST",
+    "message": "Not valid serializer PostItemSerializer",
+    "errors": {
+        "poster_name": [
+            "This field may not be null."
+        ]
+    }
+}
+```
 
 * Description
 

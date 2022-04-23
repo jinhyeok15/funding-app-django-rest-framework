@@ -32,16 +32,17 @@
 
 ## 4.22
 
-+ Response 관련 core view 설계
++ Response 관련 core view 설계 && ShopPostItemView 리팩토링
 + PostItemView -> ShopPostItemView 변경
 
 ## 4.23
 
-- docs 정리 및 주석 구체화
++ docs 정리 및 주석 구체화 && 4xx, 5xx errors response 반영
+- ValidationError 다양화
 - HttpStatus message Enum 설계
-- user view refactoring
 - POST shop/post v1.0.0 update
 - test refactoring
+- RDS 한국 서버 시간으로 적용시키기
 
 - signin API
 - PATCH shop/post/:post_id

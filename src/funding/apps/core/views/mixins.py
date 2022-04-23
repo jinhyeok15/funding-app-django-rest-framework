@@ -14,7 +14,7 @@ class ValidationMixin:
         szr = serializer(data=data)
 
         if szr.is_valid() is False:
-            raise ValidationError(f'Not valid serializer {serializer.__name__}')
+            raise ValidationError(f'Not valid serializer {serializer.__name__}', szr.errors)
         return szr
 
 class IntegrationMixin(
