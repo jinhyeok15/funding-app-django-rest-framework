@@ -13,7 +13,6 @@ from funding.apps.core.views import (
     GenericResponse as Response, HttpStatus
 )
 from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 
 
 class ShopPostItemView(IntegrationMixin, GenericAPIView):
@@ -40,12 +39,12 @@ class ShopPostItemView(IntegrationMixin, GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        **shop_post_item_logic
+        **SHOP_POST_ITEM_CREATE_LOGIC
     )
     @transaction.atomic()
     def post(self, request, *args, **kwargs):
         try:
-            serializer = self.get_valid_szr(ShopPostItemSerializer, data=request.data)
+            serializer = self.get_valid_szr(ShopPostItemRequestSerializer, data=request.data)
         except ValidationError as e:
             return Response(None, HttpStatus(400, error=e))
 
@@ -79,8 +78,6 @@ class ShopPostItemView(IntegrationMixin, GenericAPIView):
         # end session
         transaction.savepoint_commit(sid)
 
-        return Response({
-            "post_id": post.id,
-            "poster": poster_id,
-            "item": item.id
-        }, HttpStatus(201, message="생성완료"))
+        response_body = ShopPostSerializer(post)
+
+        return Response(response_body.data, HttpStatus(201, message="생성완료"))

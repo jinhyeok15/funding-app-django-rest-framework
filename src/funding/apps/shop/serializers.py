@@ -1,11 +1,12 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
+
+from funding.apps.core.models import ShopPostItemRequestModel
 from .models import *
-from funding.apps.core.models import PostItemModel
 
 
 # It is to use optain request set in ShopPostItemView
-class ShopPostItemSerializer(ModelSerializer):
+class ShopPostItemRequestSerializer(ModelSerializer):
     title = serializers.CharField()
     poster_name = serializers.CharField()
     final_date = serializers.CharField()
@@ -14,7 +15,7 @@ class ShopPostItemSerializer(ModelSerializer):
     price = serializers.IntegerField()
 
     class Meta:
-        model = PostItemModel
+        model = ShopPostItemRequestModel
         fields = '__all__'
 
 
@@ -39,3 +40,10 @@ class ItemCreateSerializer(ModelSerializer):
         fields = [
             'price', 'target_amount'
         ]
+
+
+class ShopPostSerializer(ModelSerializer):
+
+    class Meta:
+        model = ShopPost
+        fields = '__all__'

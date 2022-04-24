@@ -1,6 +1,6 @@
 from django.db import models
 from funding.apps.user.models import User
-from funding.apps.core.models import Post, PurchaseInterface
+from funding.apps.core.models import PostBaseModel, PurchaseAbstractModel
 
 
 class Item(models.Model):
@@ -10,7 +10,7 @@ class Item(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class ShopPost(Post):
+class ShopPost(PostBaseModel):
     item = models.OneToOneField(Item, on_delete=models.CASCADE)
     poster_name = models.CharField(max_length=50)
     final_date = models.CharField(max_length=25)
@@ -29,7 +29,7 @@ class ShopPost(Post):
         )
 
 
-class ShopPurchase(PurchaseInterface):
+class ShopPurchase(PurchaseAbstractModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_purchases')
     production = models.ForeignKey(Item, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

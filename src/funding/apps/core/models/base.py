@@ -2,7 +2,7 @@ from django.db import models
 from funding.apps.user.models import User
 
 
-class Post(models.Model):
+class PostBaseModel(models.Model):
     poster = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     content = models.TextField()

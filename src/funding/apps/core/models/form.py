@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class PostItemModel(models.Model):
+class ShopPostItemRequestModel(models.Model):
     title: models.CharField
     poster_name: models.CharField
     final_date: models.CharField
