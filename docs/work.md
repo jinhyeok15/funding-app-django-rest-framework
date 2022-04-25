@@ -43,11 +43,10 @@
 
 ## 4.25
 
-- ShopPost Item populate하기
-- HttpStatus message Enum 설계
++ ShopPost item, poster populate하기
 - POST shop/post v1.0.0 update
 - test refactoring
-- RDS 한국 서버 시간으로 적용시키기 -> 애플리케이션 쪽에서 건들여야함
+- status message class 추가
 - core/models 주석 달기
 - signin API
 - PATCH shop/post/:post_id

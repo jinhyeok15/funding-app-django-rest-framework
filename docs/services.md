@@ -161,21 +161,31 @@ Connect
 
 ```json
 {
-  "code": 201,
-  "status": "HTTP_201_CREATED",
-  "message": "생성완료",
-  "data": {
-    "id": 7,
-    "title": "string",
-    "content": "string",
-    "created_at": "2022-04-24T11:20:08.252706+09:00",
-    "updated_at": "2022-04-24T11:20:08.252769+09:00",
-    "poster_name": "string",
-    "final_date": "2022-04-27",
-    "status": "DONATE",
-    "poster": 2,
-    "item": 15
-  }
+    "code": 201,
+    "status": "HTTP_201_CREATED",
+    "message": "생성완료",
+    "data": {
+        "id": 23,
+        "item": {
+            "id": 36,
+            "tag": null,
+            "price": 15000,
+            "target_amount": 1000000,
+            "updated_at": "2022-04-25T19:06:34.218149+09:00"
+        },
+        "poster": {
+            "id": 2,
+            "username": "jinhyeok",
+            "email": "jinhyeok@email.com"
+        },
+        "title": "운동화?슬리퍼?고정관념x혁신적인 창조력넘치는 MANEUL마누어 스니커즈",
+        "content": "운동화+슬리퍼=MANEUL 마누어 바캉스 스니커즈\nMANEUL 마누어 신어본 사람이 모두 놀라는 마법같은 신발\n고정관념 파괴하고 창조력 넘치는  관심 백퍼 인기 신발을 찾는다면 펀딩하세요.\n새로운 도전의 시작에 함께 해주셔서 감사합니다.",
+        "created_at": "2022-04-25T19:06:34.273885+09:00",
+        "updated_at": "2022-04-25T19:06:34.273947+09:00",
+        "poster_name": "dkfk",
+        "final_date": "2022-04-30",
+        "status": "DONATE"
+    }
 }
 ```
 

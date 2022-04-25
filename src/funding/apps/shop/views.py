@@ -41,10 +41,6 @@ class ShopPostItemView(IntegrationMixin, APIView):
     )
     @transaction.atomic()
     def post(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_valid_szr(ShopPostItemRequestSerializer, data=request.data)
-        except ValidationError as e:
-            return Response(None, HttpStatus(400, error=e))
 
         poster_id = self.get_auth_user(request)
 
@@ -52,21 +48,15 @@ class ShopPostItemView(IntegrationMixin, APIView):
         sid = transaction.savepoint()
         try:
             serializer = self.get_valid_szr(
-                ItemCreateSerializer, data={
-                    'price': request.data['price'],
-                    'target_amount': request.data['target_amount']
-                }
+                ItemCreateSerializer, data=request.data
             )
             item = serializer.save()
 
             serializer = self.get_valid_szr(
                 ShopPostCreateSerializer, data={
+                    **request.data,
                     'item': item.id,
-                    'poster': poster_id,
-                    'title': request.data['title'],
-                    'content': request.data['content'],
-                    'poster_name': request.data['poster_name'],
-                    'final_date': request.data['final_date']
+                    'poster': poster_id
                 }
             )
             post = serializer.save()

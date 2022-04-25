@@ -1,22 +1,33 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
-from funding.apps.core.models import ShopPostItemRequestModel
+from funding.apps.user.serializers import UserSerializer
 from .models import *
+from drf_yasg.utils import swagger_serializer_method
 
 
-# It is to use optain request set in ShopPostItemView
-class ShopPostItemRequestSerializer(ModelSerializer):
-    title = serializers.CharField()
-    poster_name = serializers.CharField()
-    final_date = serializers.CharField()
-    content = serializers.CharField()
-    target_amount = serializers.IntegerField()
-    price = serializers.IntegerField()
+class ItemSerializer(ModelSerializer):
 
     class Meta:
-        model = ShopPostItemRequestModel
+        model = Item
         fields = '__all__'
+
+
+class ShopPostSerializer(ModelSerializer):
+    item = serializers.SerializerMethodField()
+    poster = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ShopPost
+        fields = '__all__'
+
+    @swagger_serializer_method(serializer_or_field=ItemSerializer)
+    def get_item(self, obj):
+        return ItemSerializer(obj.item).data
+    
+    @swagger_serializer_method(serializer_or_field=UserSerializer)
+    def get_poster(self, obj):
+        return UserSerializer(obj.poster).data
 
 
 class ShopPostCreateSerializer(ModelSerializer):
@@ -45,10 +56,3 @@ class ItemCreateSerializer(ModelSerializer):
         fields = [
             'price', 'target_amount'
         ]
-
-
-class ShopPostSerializer(ModelSerializer):
-
-    class Meta:
-        model = ShopPost
-        fields = '__all__'

@@ -4,12 +4,13 @@ from typing import Optional
 
 
 __all__ = [
+        'get_status_by_code',
         'HttpStatus',
         'GenericResponse',
         ]
 
 
-def _get_status_by_code(code):
+def get_status_by_code(code):
     _status = vars(status)
     try:
         idx = list(_status.values()).index(code)
@@ -24,7 +25,7 @@ class HttpStatus:
     """
     def __init__(self, code, message=None, error=None):
         self.code = code
-        self.status = _get_status_by_code(code)
+        self.status = get_status_by_code(code)
         self.message = message
         if error is not None:
             self.message = error.args[0] + "\n" + self.message if self.message is not None else error.args[0]
