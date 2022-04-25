@@ -1,5 +1,6 @@
 from django.test import TestCase
 from funding.apps.core.views.response import HttpStatus, GenericResponse
+from .components import date
 
 
 class CoreViewTests(TestCase):
@@ -9,7 +10,7 @@ class CoreViewTests(TestCase):
         self.assertEqual(http.message, 'SUCCESS')
         self.assertRaises(ValueError, HttpStatus, code='invalid code', message="fail")
 
-    def test_response_InheritedResponse(self):
+    def test_response_GenericResponse(self):
         color_data = {
             "color": "red"
         }
@@ -25,3 +26,11 @@ class CoreViewTests(TestCase):
                 "data": color_data
             }
         )
+    
+    def test_DateComponent_str_validation(self):
+        str_date = "2023-04-05"
+        self.assertEqual(str(date.DateComponent(str_date)), str_date)
+        str_date = "1997-01-20"
+        self.assertRaises(ValueError, date.DateComponent, str_date=str_date)
+        str_date = "3340,01,03"
+        self.assertRaises(ValueError, date.DateComponent, str_date=str_date)

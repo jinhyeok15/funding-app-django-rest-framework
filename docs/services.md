@@ -161,14 +161,21 @@ Connect
 
 ```json
 {
-    "code": 201,
-    "status": "HTTP_201_CREATED",
-    "message": "생성완료",
-    "data": {
-        "post_id": 5,
-        "poster": 2,
-        "item": 13
-    }
+  "code": 201,
+  "status": "HTTP_201_CREATED",
+  "message": "생성완료",
+  "data": {
+    "id": 7,
+    "title": "string",
+    "content": "string",
+    "created_at": "2022-04-24T11:20:08.252706+09:00",
+    "updated_at": "2022-04-24T11:20:08.252769+09:00",
+    "poster_name": "string",
+    "final_date": "2022-04-27",
+    "status": "DONATE",
+    "poster": 2,
+    "item": 15
+  }
 }
 ```
 
@@ -178,7 +185,7 @@ Connect
 {
     "code": 400,
     "status": "HTTP_400_BAD_REQUEST",
-    "message": "Not valid serializer PostItemSerializer",
+    "message": "Not valid serializer ShopPostItemRequestSerializer",
     "errors": {
         "poster_name": [
             "This field may not be null."

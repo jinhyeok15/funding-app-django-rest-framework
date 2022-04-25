@@ -20,6 +20,11 @@ class ShopPostItemRequestSerializer(ModelSerializer):
 
 
 class ShopPostCreateSerializer(ModelSerializer):
+    """
+    ## validation 목록
+    * final_date
+    DateComponentValidationError
+    """
 
     class Meta:
         model = ShopPost

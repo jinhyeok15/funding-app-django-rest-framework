@@ -1,6 +1,4 @@
-# GenericAPIView 사용 이유
-# https://stackoverflow.com/questions/42311888/django-rest-swagger-apiview
-from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 from .serializers import *
 from .schemas import *
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
@@ -15,7 +13,7 @@ from funding.apps.core.views import (
 from drf_yasg.utils import swagger_auto_schema
 
 
-class ShopPostItemView(IntegrationMixin, GenericAPIView):
+class ShopPostItemView(IntegrationMixin, APIView):
     """
     post:
 

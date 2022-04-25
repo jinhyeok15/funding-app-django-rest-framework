@@ -38,13 +38,17 @@
 ## 4.23
 
 + docs 정리 및 주석 구체화 && 4xx, 5xx errors response 반영
-- ValidationError 다양화
++ date validation
++ POST shop/post/ response 부분 변경 && swagger_auto_schema 부분 모듈화 작업
+
+## 4.25
+
+- ShopPost Item populate하기
 - HttpStatus message Enum 설계
 - POST shop/post v1.0.0 update
 - test refactoring
-- RDS 한국 서버 시간으로 적용시키기
-- pydantic.BaseModel로 request와 response schema 관리, swagger에 BaseModel 적용
-
+- RDS 한국 서버 시간으로 적용시키기 -> 애플리케이션 쪽에서 건들여야함
+- core/models 주석 달기
 - signin API
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id
