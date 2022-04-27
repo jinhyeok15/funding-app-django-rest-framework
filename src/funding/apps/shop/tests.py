@@ -21,12 +21,24 @@ class ShopAPITests(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token '+self.token.key)
 
     def test_create_item_post(self):
-        response = self.client.post('/shop/post/', {
+        uri = '/shop/post/'
+        request_data = {
             'title': '안녕하세요',
             'poster_name': '이진혁',
             'content': '어쩔티비 저쩔티비 우짤래미 저쩔래미 ^&^',
             'target_amount': 1000000,
-            'final_date': '2022-04-26',  # component에서 DateCpnt로 date 유효성 검사
+            'final_date': '2023-04-26',  # component에서 DateCpnt로 date 유효성 검사
             'price': 15000
-        }, format='json')
-        self.assertEqual(response.status_code, 201)
+        }
+        response = self.client.post(uri, request_data, format='json')
+        self.assertEqual(response.status_code, 201, "성공")
+
+        # serializer validation error
+        request_data['poster_name'] = ''
+        response = self.client.post(uri, request_data, format='json')
+        self.assertEqual(response.status_code, 400, "blank 에러")
+
+        # date관련 에러
+        request_data["final_date"] = "2022-04-25"
+        response = self.client.post(uri, request_data, format='json')
+        self.assertEqual(response.status_code, 400, "date형 관련 에러")

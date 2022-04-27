@@ -1,14 +1,16 @@
 from django.db import models
 from funding.apps.user.models import User
-from funding.apps.core.models import PostBaseModel, PurchaseAbstractModel
+from funding.apps.core.models import PostBaseModel, PurchaseAbstractModel, TimeStampBaseModel
 from funding.apps.core.validators import validate_date_component
 
 
-class Item(models.Model):
+class Item(TimeStampBaseModel):
     tag = models.CharField(max_length=256, null=True)
     price = models.IntegerField()
     target_amount = models.IntegerField()
-    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'shop_items'
 
 
 class ShopPost(PostBaseModel):
@@ -28,18 +30,25 @@ class ShopPost(PostBaseModel):
         return self.objects.annotate(
             participants_count=models.Count('participants')
         )
+    
+    class Meta:
+        db_table = 'shop_posts'
 
 
 class ShopPurchase(PurchaseAbstractModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_purchases')
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_purchases')
     production = models.ForeignKey(Item, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        db_table = 'shop_purchases'
 
-class Participant(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_join_logs')
-    post = models.ForeignKey(ShopPost, on_delete=models.CASCADE, related_name='participants')
+
+class Participant(TimeStampBaseModel):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_join_logs')
+    post_id = models.ForeignKey(ShopPost, on_delete=models.CASCADE, related_name='participants')
     purchase = models.OneToOneField(ShopPurchase, on_delete=models.CASCADE)
     is_join = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'shop_participants'
