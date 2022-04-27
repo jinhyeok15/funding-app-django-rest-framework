@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 # 트랜잭션 참조
 # https://docs.djangoproject.com/en/3.0/topics/db/transactions/#django.db.transaction.atomic
 from django.db import transaction
-from django.core.exceptions import ValidationError
+from funding.apps.core.exceptions import SerializerValidationError
 from funding.apps.core.views import (
     IntegrationMixin,
     GenericResponse as Response, HttpStatus
@@ -60,7 +60,7 @@ class ShopPostItemView(IntegrationMixin, APIView):
                 }
             )
             post = serializer.save()
-        except ValidationError as e:
+        except SerializerValidationError as e:
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
         # end session

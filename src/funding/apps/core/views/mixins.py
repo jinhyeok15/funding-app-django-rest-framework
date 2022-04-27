@@ -1,5 +1,5 @@
 from rest_framework.authtoken.models import Token
-from django.core.exceptions import ValidationError
+from funding.apps.core.exceptions import SerializerValidationError
 
 
 class AuthMixin:
@@ -14,7 +14,7 @@ class ValidationMixin:
         szr = serializer(data=data)
 
         if szr.is_valid() is False:
-            raise ValidationError(f'Not valid serializer {serializer.__name__}', szr.errors)
+            raise SerializerValidationError(f'Not valid serializer {serializer.__name__}', szr.errors)
         return szr
 
 class IntegrationMixin(

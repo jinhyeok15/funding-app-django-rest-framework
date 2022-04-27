@@ -1,8 +1,8 @@
-from django.core.exceptions import ValidationError
+from .exceptions import *
 from .components import date
 
-def validate_date_component(value):
+def validate_final_date_component(value):
     try:
-        date_cmp = date.DateComponent(value)
+        date_cmp = date.FinalDateComponent(value)
     except ValueError:
-        raise ValidationError(f"date 타입에 맞지 않습니다: {value}")
+        raise FinalDateValidationError(value)

@@ -8,11 +8,12 @@
 
 ## Commit 관련 정리
 
-* [DBG] 디버그
+* [DEBUG] 디버그
 * [API] API 개발
-* [RFC] 리팩토링
+* [REFAC] 리팩토링
 * [ENV] 환경 설정
 * [DOC] 문서 관련 정리
+* [TEST] 테스트
 
 ## git commit convention
 

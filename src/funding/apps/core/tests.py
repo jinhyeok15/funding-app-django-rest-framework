@@ -27,10 +27,10 @@ class CoreViewTests(TestCase):
             }
         )
     
-    def test_DateComponent_str_validation(self):
+    def test_FinalDateComponent_str_validation(self):
         str_date = "2023-04-05"
-        self.assertEqual(str(date.DateComponent(str_date)), str_date)
+        self.assertEqual(str(date.FinalDateComponent(str_date)), str_date)
         str_date = "1997-01-20"
-        self.assertRaises(ValueError, date.DateComponent, str_date=str_date)
+        self.assertRaises(ValueError, date.FinalDateComponent, str_date=str_date)
         str_date = "3340,01,03"
-        self.assertRaises(ValueError, date.DateComponent, str_date=str_date)
+        self.assertRaises(ValueError, date.FinalDateComponent, str_date=str_date)

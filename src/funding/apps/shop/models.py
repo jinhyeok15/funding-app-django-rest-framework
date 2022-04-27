@@ -1,7 +1,7 @@
 from django.db import models
 from funding.apps.user.models import User
 from funding.apps.core.models import PostBaseModel, PurchaseAbstractModel, TimeStampBaseModel
-from funding.apps.core.validators import validate_date_component
+from funding.apps.core.validators import validate_final_date_component
 
 
 class Item(TimeStampBaseModel):
@@ -16,7 +16,7 @@ class Item(TimeStampBaseModel):
 class ShopPost(PostBaseModel):
     item = models.OneToOneField(Item, on_delete=models.CASCADE)
     poster_name = models.CharField(max_length=50, blank=False)
-    final_date = models.CharField(max_length=25, validators=[validate_date_component])
+    final_date = models.CharField(max_length=25, validators=[validate_final_date_component])
     status = models.CharField(max_length=12, default='DONATE', help_text='''
         PURCHASE는 펀딩이 성공적으로 진행되어 상품 준비단계까지 진행된 상태이며, 
         DONATE는 펀딩에 참여하였으나 마감일이 끝나지 않은 상태, 

@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=50)),
                 ('content', models.TextField()),
                 ('poster_name', models.CharField(max_length=50)),
-                ('final_date', models.CharField(max_length=25, validators=[funding.apps.core.validators.validate_date_component])),
+                ('final_date', models.CharField(max_length=25, validators=[funding.apps.core.validators.validate_final_date_component])),
                 ('status', models.CharField(default='DONATE', help_text='\n        PURCHASE는 펀딩이 성공적으로 진행되어 상품 준비단계까지 진행된 상태이며, \n        DONATE는 펀딩에 참여하였으나 마감일이 끝나지 않은 상태, \n        CANCEL은 펀딩을 취소한 상태, \n        CLOSE는 펀딩 목표 금액을 넘지 못하여 펀딩이 취소된 상태를 의미한다. \n        결제는 DONATE단계에서 진행되며, CANCEL이 되면 결제 내역이 환불된다.\n    ', max_length=12)),
             ],
             options={
