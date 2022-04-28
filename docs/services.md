@@ -17,6 +17,10 @@
   4. [DELETE shop/:post_id/](#4-delete-shoppostpost_id)
   5. [GET shop/:post_id](#5-get-shoppostpost_id)
   6. [GET shop/posts/](#6-get-shopposts)
+* 기타
+  1. [Commit 관련 정리](#commit-관련-정리)
+  2. [git commit convension](#git-commit-convention)
+  3. [Apply swagger schema](#apply-swagger-schema)
 
 ## 서비스 분석
 
@@ -232,3 +236,22 @@ response에서는 client에서 사용할 게시물 id와 게시자 id, item id�
 펀딩 상품 구매하기 API
 
 게시글에 올린 상품을 구매
+
+## 기타
+
+### Commit 관련 정리
+
+* [DEBUG] 디버그
+* [API] API 개발
+* [REFAC] 리팩토링
+* [ENV] 환경 설정
+* [DOC] 문서 관련 정리
+* [TEST] 테스트
+
+### git commit convention
+
+[https://www.conventionalcommits.org/en/v1.0.0/](https://www.conventionalcommits.org/en/v1.0.0/)
+
+### Apply swagger schema
+
+[https://drf-yasg.readthedocs.io/en/stable/custom_spec.html](https://drf-yasg.readthedocs.io/en/stable/custom_spec.html)
