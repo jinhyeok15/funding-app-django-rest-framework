@@ -48,6 +48,8 @@
 ## 4.27
 + models refactoring && test case 수정 (test_create_item_post case 추가)
 + exceptions에 DateValidationError 추가
+
+## 4.28
 - POST shop/post v1.0.0 update
 - signin API
 - PATCH shop/post/:post_id

@@ -13,9 +13,9 @@
 * API 구축
   1. [POST account/signup/](#1-post-accountsignup)
   2. [POST shop/post/](#2-post-shoppost-v100)
-  3. [PATCH shop/post/:post_id/](#3-patch-shoppostpost_id)
-  4. [DELETE shop/post/:post_id/](#4-delete-shoppostpost_id)
-  5. [GET shop/post/:post_id](#5-get-shoppostpost_id)
+  3. [PATCH shop/:post_id/](#3-patch-shoppostpost_id)
+  4. [DELETE shop/:post_id/](#4-delete-shoppostpost_id)
+  5. [GET shop/:post_id](#5-get-shoppostpost_id)
   6. [GET shop/posts/](#6-get-shopposts)
 
 ## 서비스 분석
@@ -28,7 +28,12 @@
 
 * 유저는 결제할 수 있는 Pocket을 등록한 후 purchase할 수 있다.
 
-* ShopPost에는 status=SUCCESS/DONATE/CANCEL/CLOSE 컬럼이 존재한다. PURCHASE는 펀딩이 성공적으로 진행되어 상품 준비단계까지 진행된 상태이며, DONATE는 펀딩에 참여하였으나 마감일이 끝나지 않은 상태, CANCEL은 펀딩을 취소한 상태, CLOSE는 펀딩 목표 금액을 넘지 못하여 펀딩이 취소된 상태를 의미한다. 결제는 DONATE단계에서 진행되며, CANCEL이 되면 결제 내역이 환불된다.
+* ShopPost에는 status=SUCCESS/FUNDING/CLOSE/CANCEL 컬럼이 존재한다.
+SUCCESS는 펀딩이 성공적으로 진행되어 상품 준비단계까지 진행된 상태이며,
+FUNDING는 펀딩이 진행중인 상태,
+CLOSE는 펀딩이 종료된 상태,
+CANCEL는 펀딩 목표 금액을 넘지 못하여 펀딩이 취소된 상태를 의미한다.
+결제는 DONATE단계에서 진행되며, CANCEL이 되면 결제 내역이 환불된다.
 
 * 펀딩 shop 도메인에서 결제부분을 따로 빼는 것을 고려하였으나, 기존 앱에서 펀딩 shop 도메인을 추가하는 것이라면 shop 내부에서 purchase 내역을 관리하는 것이 좋을 것으로 판단하였음
 
@@ -212,10 +217,18 @@ Connect
 
 response에서는 client에서 사용할 게시물 id와 게시자 id, item id를 제공하여 client 측에서 접근할 수 있도록 하였습니다.
 
-### 3. PATCH shop/post/:post_id/
+### 3. PATCH shop/:post_id/
 
-### 4. DELETE shop/post/:post_id/
+### 4. DELETE shop/:post_id/
 
-### 5. GET shop/post/:post_id/
+### 5. GET shop/:post_id/
 
 ### 6. GET shop/posts/
+
+### 7. POST shop/:post_id/purchase
+
+* Description
+
+펀딩 상품 구매하기 API
+
+게시글에 올린 상품을 구매

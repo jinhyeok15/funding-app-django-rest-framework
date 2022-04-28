@@ -4,14 +4,17 @@ AbstractModel 중에 필드명은 동일하게 가져가지만 구현부분이 �
 
 
 from django.db import models
+from .base import TimeStampBaseModel
 
 
-class PurchaseAbstractModel(models.Model):
+class PurchaseAbstractModel(TimeStampBaseModel):
     """
     유저(user)와 품목(production)을 abstract로 상속하여 받는다
+    status: 결제가 성공했는지(SUCCESS) 실패했는지(FAIL) 혹은 취소했는지(CANCEL)
     """
     user_id: models.ForeignKey
     production: models.ForeignKey
+    status: models.CharField  # 결제가 성공했는지(SUCCESS) 실패했는지(FAIL) 혹은 취소했는지(CANCEL)
 
     class Meta:
         abstract = True

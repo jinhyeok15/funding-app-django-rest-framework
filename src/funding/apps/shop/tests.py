@@ -19,8 +19,21 @@ class ShopAPITests(TestCase):
         self.user = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123')
         self.token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token '+self.token.key)
+        self.item = Item.objects.create(
+            tag="cheeze",
+            price=4500,
+            target_amount=600000
+        )
+        self.post = ShopPost.objects.create(
+            poster=self.user,
+            title="hi hi hi",
+            content="nice to meet you",
+            item=self.item,
+            poster_name="jj",
+            final_date="2022.07.10"
+        )
 
-    def test_create_item_post(self):
+    def test_shop_post_item_create(self):
         uri = '/shop/post/'
         request_data = {
             'title': '안녕하세요',
@@ -42,3 +55,8 @@ class ShopAPITests(TestCase):
         request_data["final_date"] = "2022-04-25"
         response = self.client.post(uri, request_data, format='json')
         self.assertEqual(response.status_code, 400, "date형 관련 에러")
+    
+    def test_shop_post_purchase_create(self):
+        uri = f'/shop/{self.post.id}/purchase/'
+        response = self.client.post(uri)
+        self.assertEqual(response.status_code, 200, "200 여부")
