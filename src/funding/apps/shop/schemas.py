@@ -40,7 +40,8 @@ SHOP_POST_ITEM_CREATE_LOGIC = {
     ],
     "responses": {
         201: ShopPostSerializer,
-        400: get_status_by_code(400)
+        400: get_status_by_code(400),
+        401: get_status_by_code(401)
     }
 }
 
@@ -52,7 +53,8 @@ SHOP_POST_PURCHASE_CREATE_LOGIC = {
     ],
     "responses": {
         201: "생성완료",
-        400: get_status_by_code(400)
+        400: get_status_by_code(400),
+        401: get_status_by_code(401)
     }
 }
 
@@ -63,6 +65,7 @@ SHOP_POST_DETAIL_READ_LOGIC = {
         AUTH_TOKEN_PARAMETER
     ],
     "responses": {
-        200: "조회완료"
+        200: "조회완료",
+        401: get_status_by_code(401),
     }
 }

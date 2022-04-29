@@ -105,4 +105,4 @@ class ShopPostPurchaseView(IntegrationMixin, APIView):
         2. 지갑에 있는 금액보다 상품 금액이 크면 결제가 불가능하다. 이 부분에 대해 Validation 검증 들어가야 함.
         """
 
-        return Response(None, HttpStatus(200))
+        return Response(data=None, http=HttpStatus(110, "NOT_CREATED"), status=200)
