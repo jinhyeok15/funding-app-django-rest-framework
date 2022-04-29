@@ -21,7 +21,7 @@ class ShopPostItemView(IntegrationMixin, APIView):
     @transaction.atomic()
     def post(self, request, *args, **kwargs):
         """
-        # 펀딩 게시글 생성 API
+        # 펀딩 게시글 생성 API v1.0.0
 
         ## 개요
 

@@ -145,7 +145,7 @@ Connect
 * Response(200)
 * Response(400)
 
-### 2. POST shop/post/ v1.0.0
+### 2. POST shop/v1/post/ v1.0.0
 
 * Header(required)
 
