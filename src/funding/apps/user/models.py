@@ -12,7 +12,7 @@ class User(AbstractUser):
 class Pocket(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="pocket")
     bank_account_type = models.CharField(max_length=50, null=True)
-    is_activate = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
 
 
 @receiver(post_save, sender=User)

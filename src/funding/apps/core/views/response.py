@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import status as drf_status
-from typing import Optional, Union
+from typing import Optional
 
 
 __all__ = [
@@ -10,13 +10,13 @@ __all__ = [
         ]
 
 
-def get_status_by_code(code, message=None):
+def get_status_by_code(code):
     _status = vars(drf_status)
     try:
         idx = list(_status.values()).index(code)
         return list(_status.keys())[idx]
     except ValueError:
-        return message
+        raise ValueError
 
 
 class HttpStatus:
@@ -25,11 +25,18 @@ class HttpStatus:
     """
     def __init__(self, code, message=None, error=None):
         self.code = code
-        self.status = get_status_by_code(code, message=message)
+        try:
+            self.status = get_status_by_code(code)
+        except:
+            self.status = None
         self.message = message
         if error is not None:
             self.message = error.args[0]
             self.errors = error.args[1]
+            try:
+                self.status = error.status
+            except AttributeError:
+                pass
 
 
 class GenericResponse(Response):
@@ -41,7 +48,8 @@ class GenericResponse(Response):
     4xx 혹은 5xx status의 경우 data 대신 errors를 전달해야 한다.
     """
     def __init__(self, data=None, http: Optional[HttpStatus]=None, status=None, **kwargs):
-        
+        self.status = status
+
         if isinstance(http, HttpStatus):
             status_code = http.code
             if drf_status.is_client_error(status_code) or drf_status.is_server_error(status_code):
@@ -51,6 +59,13 @@ class GenericResponse(Response):
                     "message": http.message,
                     "errors": http.errors
                 }
+            elif status_code>=103 and status_code<200:
+                data_format = {
+                    "code": status_code,
+                    "status": "USER_ERROR",
+                    "message": http.message,
+                }
+                self.status = 400
             else:
                 data_format = {
                     "code": status_code,
@@ -59,13 +74,13 @@ class GenericResponse(Response):
                     "data": data
                 }
 
-            if status is None:
+            if self.status is None:
                 super().__init__(
                     data_format, status_code, **kwargs
                 )
             else:
                 super().__init__(
-                    data_format, status, **kwargs
+                    data_format, self.status, **kwargs
                 )
         elif isinstance(http, int):
             assert "http type is HttpStatus not int"

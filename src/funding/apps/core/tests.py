@@ -8,7 +8,7 @@ class CoreViewTests(TestCase):
         http = HttpStatus(200, 'SUCCESS')
         self.assertEqual(http.code, 200)
         self.assertEqual(http.message, 'SUCCESS')
-        self.assertRaises(ValueError, HttpStatus, code='invalid code', message="fail")
+        self.assertEqual(HttpStatus(800, message="fail").status, None)
 
     def test_response_GenericResponse(self):
         color_data = {

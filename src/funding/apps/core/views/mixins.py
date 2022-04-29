@@ -1,5 +1,7 @@
 from rest_framework.authtoken.models import Token
-from funding.apps.core.exceptions import SerializerValidationError
+from ..exceptions import *
+from django.core.exceptions import ObjectDoesNotExist
+from funding.apps.user.models import Pocket
 
 
 class HeaderMixin:
@@ -29,6 +31,14 @@ class ValidationMixin:
         if szr.is_valid() is False:
             raise SerializerValidationError(f'Not valid serializer {serializer.__name__}', szr.errors)
         return szr
+    
+    def get_valid_user_pocket(self, user_id):
+        try:
+            pocket = Pocket.objects.get(user=user_id, is_active=True)
+            return pocket
+        except ObjectDoesNotExist:
+            raise DoesNotExistedUserPocketError(user_id)
+
 
 class IntegrationMixin(
     HeaderMixin, ValidationMixin

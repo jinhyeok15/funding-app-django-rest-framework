@@ -1,7 +1,7 @@
 from django.db import models
 from funding.apps.user.models import User
 from funding.apps.core.models import PostBaseModel, PurchaseAbstractModel, TimeStampBaseModel
-from funding.apps.core.validators import validate_final_date_component
+from funding.apps.core.models.validators import validate_final_date_component
 
 
 class Item(TimeStampBaseModel):

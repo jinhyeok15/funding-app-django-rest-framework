@@ -5,7 +5,10 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 # 트랜잭션 참조
 # https://docs.djangoproject.com/en/3.0/topics/db/transactions/#django.db.transaction.atomic
 from django.db import transaction
-from funding.apps.core.exceptions import SerializerValidationError
+from funding.apps.core.exceptions import (
+    SerializerValidationError,
+    DoesNotExistedUserPocketError
+)
 from funding.apps.core.views import (
     IntegrationMixin,
     GenericResponse as Response, HttpStatus
@@ -105,4 +108,11 @@ class ShopPostPurchaseView(IntegrationMixin, APIView):
         2. 지갑에 있는 금액보다 상품 금액이 크면 결제가 불가능하다. 이 부분에 대해 Validation 검증 들어가야 함.
         """
 
-        return Response(data=None, http=HttpStatus(110, "NOT_CREATED"), status=200)
+        user_id = self.get_auth_user(request)
+
+        try:
+            pocket = self.get_valid_user_pocket(user_id)
+        except DoesNotExistedUserPocketError as e:
+            return Response(None, http=HttpStatus(422, error=e))
+
+        return Response(data=None, http=HttpStatus(200, "NOT_CREATED"))

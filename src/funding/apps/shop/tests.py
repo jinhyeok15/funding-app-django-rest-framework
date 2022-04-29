@@ -19,6 +19,7 @@ class ShopAPITests(TestCase):
         self.user = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123')
         self.token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token '+self.token.key)
+
         self.item = Item.objects.create(
             tag="cheeze",
             price=4500,
@@ -34,7 +35,7 @@ class ShopAPITests(TestCase):
         )
 
     def test_shop_post_item_create(self):
-        uri = '/shop/post/'
+        uri = '/shop/v1/post/'
         request_data = {
             'title': '안녕하세요',
             'poster_name': '이진혁',
@@ -59,4 +60,4 @@ class ShopAPITests(TestCase):
     def test_shop_post_purchase_create(self):
         uri = f'/shop/{self.post.id}/purchase/'
         response = self.client.post(uri)
-        self.assertEqual(response.status_code, 200, "200 여부")
+        self.assertEqual(response.status_code, 422, "user pocket error 여부")
