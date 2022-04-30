@@ -61,7 +61,7 @@ class Purchase(PurchaseAbstractModel):
 
 
 class Participant(TimeStampBaseModel):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_join_logs', db_column='user_id')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_join_logs', db_column='user_id')
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='participants', db_column='post_id')
     purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE)
     is_join = models.BooleanField(default=True)

@@ -21,6 +21,9 @@ class FinalDateValidationError(DjangoValidationError):
 
 # user
 class DoesNotExistedUserPocketError(DjangoValidationError):
+    """
+    유저가 지갑을 등록하지 않았습니다.
+    """
     status = "DOES_NOT_EXIST_USER_POCKET"
     def __init__(self, user_id):
         self.message = "유저가 지갑을 등록하지 않았습니다."
@@ -31,6 +34,9 @@ class DoesNotExistedUserPocketError(DjangoValidationError):
 
 # shop
 class UserAlreadyParticipateError(DjangoValidationError):
+    """
+    유저가 이미 참여한 게시물입니다.
+    """
     status = "USER_ALREADY_PARTICIPATE"
     def __init__(self, user_id, post_id):
         self.message = "유저가 이미 참여한 게시물입니다."

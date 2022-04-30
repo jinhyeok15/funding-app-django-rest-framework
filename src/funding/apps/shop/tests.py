@@ -103,7 +103,7 @@ class ShopAPITests(TestCase):
             production=self.item
         )
         Participant.objects.create(
-            user_id=partner,
+            user=partner,
             post_id=self.post,
             purchase=purchase
         )
