@@ -53,8 +53,10 @@
 + POST shop/v1/post v1.0.0 update
 + user pocket validation 추가
 
-## 4.29
+## 4.30
 + GET shop/v1/:post_id/want_participate/ update
+
+## 4.31
 - signin API
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id

@@ -19,6 +19,7 @@ class FinalDateValidationError(DjangoValidationError):
         super().__init__(self.message)
 
 
+# user
 class DoesNotExistedUserPocketError(DjangoValidationError):
     status = "DOES_NOT_EXIST_USER_POCKET"
     def __init__(self, user_id):
@@ -28,6 +29,7 @@ class DoesNotExistedUserPocketError(DjangoValidationError):
         })
 
 
+#shop
 class UserAlreadyParticipateError(DjangoValidationError):
     status = "USER_ALREADY_PARTICIPATE"
     def __init__(self, user_id, post_id):
