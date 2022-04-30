@@ -10,10 +10,10 @@ __all__ = [
         ]
 
 
-def get_status_by_code(code):
+def get_status_by_code(status_code):
     _status = vars(drf_status)
     try:
-        idx = list(_status.values()).index(code)
+        idx = list(_status.values()).index(status_code)
         return list(_status.keys())[idx]
     except ValueError:
         raise ValueError
@@ -23,10 +23,10 @@ class HttpStatus:
     """
     rest_framework status의 status code 기반으로 status와 code, custom message를 갖고 있는 object
     """
-    def __init__(self, code, message=None, error=None):
-        self.code = code
+    def __init__(self, status_code, message=None, error=None):
+        self.code = status_code
         try:
-            self.status = get_status_by_code(code)
+            self.status = get_status_by_code(status_code)
         except:
             self.status = None
         self.message = message
@@ -59,13 +59,6 @@ class GenericResponse(Response):
                     "message": http.message,
                     "errors": http.errors
                 }
-            elif status_code>=103 and status_code<200:
-                data_format = {
-                    "code": status_code,
-                    "status": "USER_ERROR",
-                    "message": http.message,
-                }
-                self.status = 400
             else:
                 data_format = {
                     "code": status_code,

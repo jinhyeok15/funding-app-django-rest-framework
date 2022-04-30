@@ -2,6 +2,12 @@ from rest_framework.serializers import ValidationError as SerializerValidationEr
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 
+class DoesNotIncludeStatusError(KeyError):
+    def __init__(self):
+        self.message = "Does not include status"
+        super().__init__(self.message)
+
+
 class FinalDateValidationError(DjangoValidationError):
     """
     DateComponent 타입에는 yyyy-MM-dd 형식이 와야하며,
@@ -16,5 +22,17 @@ class FinalDateValidationError(DjangoValidationError):
 class DoesNotExistedUserPocketError(DjangoValidationError):
     status = "DOES_NOT_EXIST_USER_POCKET"
     def __init__(self, user_id):
-        self.message = f"유저가 지갑을 등록하지 않았습니다. user_id: {user_id}"
-        super().__init__(self.message)
+        self.message = "유저가 지갑을 등록하지 않았습니다."
+        super().__init__(self.message, {
+            "user_id": user_id
+        })
+
+
+class UserAlreadyParticipateError(DjangoValidationError):
+    status = "USER_ALREADY_PARTICIPATE"
+    def __init__(self, user_id, post_id):
+        self.message = "유저가 이미 참여한 게시물입니다."
+        super().__init__(self.message, {
+            "user_id": user_id,
+            "post_id": post_id
+        })

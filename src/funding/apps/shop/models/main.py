@@ -1,19 +1,23 @@
 from django.db import models
 from funding.apps.user.models import User
-from funding.apps.core.models import PostBaseModel, PurchaseAbstractModel, TimeStampBaseModel
-from funding.apps.core.models.validators import validate_final_date_component
+from funding.apps.core.models import (
+    PostBaseModel,
+    PurchaseAbstractModel,
+    TimeStampBaseModel,
+    ItemBaseModel
+)
+from .validators import *
+from .managers import *
 
 
-class Item(TimeStampBaseModel):
-    tag = models.CharField(max_length=256, null=True)
-    price = models.IntegerField()
+class Item(ItemBaseModel):
     target_amount = models.IntegerField()
 
     class Meta:
         db_table = 'shop_items'
 
 
-class ShopPost(PostBaseModel):
+class Post(PostBaseModel):
     item = models.OneToOneField(Item, on_delete=models.CASCADE)
     poster_name = models.CharField(max_length=50, blank=False)
     final_date = models.CharField(max_length=25, validators=[validate_final_date_component])
@@ -40,24 +44,29 @@ class ShopPost(PostBaseModel):
         db_table = 'shop_posts'
 
 
-class ShopPurchase(PurchaseAbstractModel):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_purchases')
-    production = models.ForeignKey(Item, on_delete=models.CASCADE)
-    status = models.CharField(max_length=12, choices=[
+class Purchase(PurchaseAbstractModel):
+    STATUS_CHOICES = [
         ('SUCCESS', '성공'),
         ('FAIL', '실패'),
         ('CANCEL', '취소/환불')
-    ], default='SUCCESS')
+    ]
+    STATUS_DEFAULT = 'SUCCESS'
+
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_purchases', db_column='user_id')
+    production = models.ForeignKey(Item, on_delete=models.CASCADE)
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=STATUS_DEFAULT)
 
     class Meta:
         db_table = 'shop_purchases'
 
 
 class Participant(TimeStampBaseModel):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_join_logs')
-    post_id = models.ForeignKey(ShopPost, on_delete=models.CASCADE, related_name='participants')
-    purchase = models.OneToOneField(ShopPurchase, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shop_join_logs', db_column='user_id')
+    post_id = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='participants', db_column='post_id')
+    purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE)
     is_join = models.BooleanField(default=True)
+
+    objects = ParticipantManager()
 
     class Meta:
         db_table = 'shop_participants'

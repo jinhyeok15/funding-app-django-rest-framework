@@ -8,6 +8,7 @@ from funding.apps.core.exceptions import (
 )
 
 AUTH_TOKEN_PARAMETER = Parameter('Authorization', openapi.IN_HEADER, description="유저 토큰 -> Token {your token}", type=openapi.TYPE_STRING)
+POST_ID_PATH_PARAMETER = Parameter("post_id", IN_PATH, required=True, type=TYPE_INTEGER)
 
 
 SHOP_POST_ITEM_CREATE_LOGIC = {
@@ -49,13 +50,13 @@ SHOP_POST_ITEM_CREATE_LOGIC = {
 }
 
 
-SHOP_POST_PURCHASE_CREATE_LOGIC = {
+SHOP_WANT_PARTICIPATE_LOGIC = {
     "manual_parameters": [
-        Parameter("post_id", IN_PATH, required=True, type=TYPE_INTEGER),
+        POST_ID_PATH_PARAMETER,
         AUTH_TOKEN_PARAMETER
     ],
     "responses": {
-        201: "생성완료",
+        100: get_status_by_code(100),
         400: get_status_by_code(400),
         401: get_status_by_code(401),
         422: DoesNotExistedUserPocketError(0).message
@@ -65,7 +66,7 @@ SHOP_POST_PURCHASE_CREATE_LOGIC = {
 
 SHOP_POST_DETAIL_READ_LOGIC = {
     "manual_parameters": [
-        Parameter("post_id", IN_PATH, required=True, type=TYPE_INTEGER),
+        POST_ID_PATH_PARAMETER,
         AUTH_TOKEN_PARAMETER
     ],
     "responses": {

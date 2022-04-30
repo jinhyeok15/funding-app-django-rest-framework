@@ -18,7 +18,7 @@ class ShopPostSerializer(ModelSerializer):
     poster = serializers.SerializerMethodField()
 
     class Meta:
-        model = ShopPost
+        model = Post
         fields = '__all__'
 
     @swagger_serializer_method(serializer_or_field=ItemSerializer)
@@ -38,7 +38,7 @@ class ShopPostCreateSerializer(ModelSerializer):
     """
 
     class Meta:
-        model = ShopPost
+        model = Post
         fields = [
             'item',
             'poster', 

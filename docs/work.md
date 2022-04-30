@@ -50,7 +50,11 @@
 + exceptions에 DateValidationError 추가
 
 ## 4.28
-- POST shop/post v1.0.0 update
++ POST shop/v1/post v1.0.0 update
++ user pocket validation 추가
+
+## 4.29
++ GET shop/v1/:post_id/want_participate/ update
 - signin API
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id

@@ -1,2 +1,2 @@
-from .mixins import IntegrationMixin
+from .mixins import *
 from .response import *

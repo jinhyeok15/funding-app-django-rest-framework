@@ -1,18 +1,22 @@
 from rest_framework.views import APIView
-from .serializers import *
-from .schemas import *
+from ..serializers import *
+from funding.apps.user.serializers import (
+    PocketSerializer as UserPocketSerializer
+)
+from ..schemas import *
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 # 트랜잭션 참조
 # https://docs.djangoproject.com/en/3.0/topics/db/transactions/#django.db.transaction.atomic
 from django.db import transaction
 from funding.apps.core.exceptions import (
     SerializerValidationError,
-    DoesNotExistedUserPocketError
+    DoesNotExistedUserPocketError,
+    UserAlreadyParticipateError
 )
 from funding.apps.core.views import (
-    IntegrationMixin,
     GenericResponse as Response, HttpStatus
 )
+from .mixins import IntegrationMixin
 from drf_yasg.utils import swagger_auto_schema
 
 
@@ -22,7 +26,7 @@ class ShopPostItemView(IntegrationMixin, APIView):
 
     @swagger_auto_schema(**SHOP_POST_ITEM_CREATE_LOGIC)
     @transaction.atomic()
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         """
         # 펀딩 게시글 생성 API v1.0.0
 
@@ -81,38 +85,37 @@ class ShopPostItemView(IntegrationMixin, APIView):
         return Response(response_body.data, HttpStatus(201, message="생성완료"))
 
 
-class ShopPostPurchaseView(IntegrationMixin, APIView):
+class ShopWantParticipateView(IntegrationMixin, APIView):
     
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(**SHOP_POST_PURCHASE_CREATE_LOGIC)
-    def post(self, request, *args, **kwargs):
+    @swagger_auto_schema(**SHOP_WANT_PARTICIPATE_LOGIC)
+    def get(self, request, post_id):
         """
-        # 펀딩 상품 구매하기 API
+        # 펀딩 상품 참여 가능 여부 체크 API
 
         ## 개요
 
         - 펀딩 참여하기 버튼을 눌렀을 때, 상품 결제 창으로 옮겨진다.
 
-        - 결제하기 버튼을 최종적으로 눌렀을 때, 해당 API가 불려진다.
-
-        - 게시글에 올린 상품을 구매
-
-        - 구매 이후 participant API 호출
+        - 결제 창으로 옮겨지기 전 해당 API를 통해 유저의 결제 상태를 체크한다.
 
         ## 필수요건
         
         1. 유저 지갑 개설 여부 조회(is_active) 후, 개설이 되어 있을 경우 결제 진행.
-        (단 이 부분을 요청하는 API를 따로 떼서 참여하기 버튼을 클릭했을 시에 검증이 ~들어갈 수도 있음~ -> API 필요: 한 사람이 한번만 참여 가능)
     
-        2. 지갑에 있는 금액보다 상품 금액이 크면 결제가 불가능하다. 이 부분에 대해 Validation 검증 들어가야 함.
+        2. 유저가 이미 참여를 한 경우 ValidationError
         """
 
         user_id = self.get_auth_user(request)
 
         try:
+            self.validate_unparticipated_user(user_id, post_id)
             pocket = self.get_valid_user_pocket(user_id)
+            response_body = UserPocketSerializer(pocket)
         except DoesNotExistedUserPocketError as e:
-            return Response(None, http=HttpStatus(422, error=e))
+            return Response(None, HttpStatus(422, error=e))
+        except UserAlreadyParticipateError as e:
+            return Response(None, HttpStatus(400, error=e))
 
-        return Response(data=None, http=HttpStatus(200, "NOT_CREATED"))
+        return Response({"pocket":response_body.data}, HttpStatus(200, "OK"))

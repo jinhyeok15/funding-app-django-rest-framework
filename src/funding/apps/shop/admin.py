@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import Item, ShopPost, ShopPurchase, Participant
+from .models import Item, Post, Purchase, Participant
 
 admin.site.register(Item)
-admin.site.register(ShopPost)
-admin.site.register(ShopPurchase)
+admin.site.register(Post)
+admin.site.register(Purchase)
 admin.site.register(Participant)

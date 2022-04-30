@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from funding.apps.user.models import User
+from ..models import User
 
 
 class UserSerializer(ModelSerializer):

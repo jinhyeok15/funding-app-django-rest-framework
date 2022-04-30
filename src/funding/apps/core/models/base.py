@@ -1,5 +1,7 @@
 from django.db import models
 from funding.apps.user.models import User
+from ..exceptions import DoesNotIncludeStatusError
+from typing import List
 
 
 class TimeStampBaseModel(models.Model):
@@ -9,6 +11,35 @@ class TimeStampBaseModel(models.Model):
     """
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class StatusManager(models.Manager):
+    def get(self, **kwargs):
+        if 'status' not in kwargs.keys():
+            raise DoesNotIncludeStatusError()
+        return super().get(**kwargs)
+
+
+class StatusBaseModel(TimeStampBaseModel):
+    status: models.CharField
+    objects = StatusManager()
+
+    class Meta:
+        abstract = True
+
+
+class ItemBaseModel(TimeStampBaseModel):
+    """
+    tag = models.CharField(max_length=256, null=True, help_text="아이템 설명 태그")
+    price = models.IntegerField()
+    created_at: 생성일자
+    updated_at: 수정일자
+    """
+    tag = models.CharField(max_length=256, null=True, help_text="아이템 설명 태그")
+    price = models.IntegerField()
 
     class Meta:
         abstract = True
