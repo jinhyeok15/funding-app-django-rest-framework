@@ -29,7 +29,7 @@ class DoesNotExistedUserPocketError(DjangoValidationError):
         })
 
 
-#shop
+# shop
 class UserAlreadyParticipateError(DjangoValidationError):
     status = "USER_ALREADY_PARTICIPATE"
     def __init__(self, user_id, post_id):

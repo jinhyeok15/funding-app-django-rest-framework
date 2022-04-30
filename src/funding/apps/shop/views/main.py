@@ -61,6 +61,8 @@ class ShopPostItemView(IntegrationMixin, APIView):
         # create session
         sid = transaction.savepoint()
         try:
+            self.get_valid_user_pocket(poster_id)
+
             serializer = self.get_valid_szr(
                 ItemCreateSerializer, data=request.data
             )
@@ -77,6 +79,9 @@ class ShopPostItemView(IntegrationMixin, APIView):
         except SerializerValidationError as e:
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
+        except DoesNotExistedUserPocketError as e:
+            transaction.savepoint_rollback(sid)
+            return Response(None, HttpStatus(422, error=e))
         # end session
         transaction.savepoint_commit(sid)
 

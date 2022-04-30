@@ -65,6 +65,10 @@ class ShopAPITests(TestCase):
             'price': 15000
         }
         response = self.client.post(uri, request_data, format='json')
+        self.assertEqual(response.status_code, 422, "422 fail")
+
+        Pocket.objects.get(user_id=self.user.id, is_active=False).update(bank_account_type="NH", is_active=True)
+        response = self.client.post(uri, request_data, format='json')
         self.assertEqual(response.status_code, 201, "201 fail")
 
         # serializer validation error
