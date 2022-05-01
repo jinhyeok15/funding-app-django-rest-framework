@@ -15,8 +15,8 @@ class FinalDateValidationError(DjangoValidationError):
     """
     status = "NOT_VALID_DATE_TYPE"
     def __init__(self, value):
-        self.message = f"date 타입에 맞지 않습니다: {value}"
-        super().__init__(self.message)
+        self.message = "date 타입에 맞지 않습니다"
+        super().__init__(self.message, {"date": value})
 
 
 # user
@@ -44,3 +44,23 @@ class UserAlreadyParticipateError(DjangoValidationError):
             "user_id": user_id,
             "post_id": post_id
         })
+
+
+class PostCannotParticipateError(DjangoValidationError):
+    """
+    게시물에 접근할 수 없어 참여할 수 없습니다.
+    """
+    status = "POST_CANNOT_PARTICIPATE"
+    def __init__(self, post_id):
+        self.message = "게시물에 접근할 수 없어 참여할 수 없습니다."
+        super().__init__(self.message, {"post_id": post_id})
+
+
+class PosterCannotParticipateError(DjangoValidationError):
+    """
+    게시자는 참여할 수 없습니다.
+    """
+    status = "POSTER_CANNOT_PARTICIPATE"
+    def __init__(self, user_id):
+        self.message = "게시자는 참여할 수 없습니다."
+        super().__init__(self.message, {"poster": user_id})

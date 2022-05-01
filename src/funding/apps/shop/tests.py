@@ -1,9 +1,13 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
+from rest_framework.test import APITestCase, URLPatternsTestCase
 from rest_framework.authtoken.models import Token
 from .models import *
 from funding.apps.user.models import User, Pocket
-from funding.apps.core.exceptions import DoesNotIncludeStatusError
+from funding.apps.core.exceptions import (
+    DoesNotIncludeStatusError,
+    UserAlreadyParticipateError
+)
 
 
 class ShopModelTests(TestCase):
@@ -30,12 +34,11 @@ class ShopModelTests(TestCase):
         self.assertRaises(DoesNotIncludeStatusError, Purchase.objects.get, pk=self.purchase.id)
 
 
-class ShopAPITests(TestCase):
+class ShopAPITests(APITestCase):
     def setUp(self):
-        self.client = APIClient()
         self.user = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123')
         self.token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token '+self.token.key)
+        self.headers = {"HTTP_AUTHORIZATION": 'Token '+self.token.key}
 
         self.item = Item.objects.create(
             tag="cheeze",
@@ -50,9 +53,6 @@ class ShopAPITests(TestCase):
             poster_name="jj",
             final_date="2022.07.10"
         )
-    
-    def tearDown(self) -> None:
-        return super().tearDown()
 
     def test_ShopPostItemView_post(self):
         uri = '/shop/v1/post/'
@@ -64,40 +64,45 @@ class ShopAPITests(TestCase):
             'final_date': '2023-04-26',  # component에서 DateCpnt로 date 유효성 검사
             'price': 15000
         }
-        response = self.client.post(uri, request_data, format='json')
-        self.assertEqual(response.status_code, 422, "422 fail")
+
+        # DOES_NOT_EXIST_USER_POCKET test
+        response = self.client.post(uri, request_data, format='json', **self.headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['status'], 'DOES_NOT_EXIST_USER_POCKET')
 
         Pocket.objects.get(user_id=self.user.id, is_active=False).update(bank_account_type="NH", is_active=True)
-        response = self.client.post(uri, request_data, format='json')
+        response = self.client.post(uri, request_data, format='json', **self.headers)
         self.assertEqual(response.status_code, 201, "201 fail")
 
         # serializer validation error
         request_data['poster_name'] = ''
-        response = self.client.post(uri, request_data, format='json')
+        response = self.client.post(uri, request_data, format='json', **self.headers)
         self.assertEqual(response.status_code, 400, "400 serializer error fail")
 
         # date관련 에러
         request_data["final_date"] = "2022-04-25"
-        response = self.client.post(uri, request_data, format='json')
+        response = self.client.post(uri, request_data, format='json', **self.headers)
         self.assertEqual(response.status_code, 400, "400 date형 관련 에러 fail")
     
     def test_ShopWantParticipateView_get(self):
         uri = f'/shop/v1/{self.post.id}/want_participate/'
         partner = User.objects.create_user('partner1', 'partner1@partner.com', 'partner123')
         ptoken = Token.objects.create(user=partner)
-        partner_client = APIClient()
-        partner_client.credentials(HTTP_AUTHORIZATION='Token '+ptoken.key)
 
-        # 422 test
-        response = partner_client.get(uri)
-        self.assertEqual(response.status_code, 422, "422 fail")
+        headers = {
+            "HTTP_AUTHORIZATION": 'Token '+ptoken.key
+        }
+
+        # DOES_NOT_EXIST_USER_POCKET test
+        response = self.client.get(uri, **headers)
+        self.assertEqual(response.data['status'], 'DOES_NOT_EXIST_USER_POCKET')
 
         # 200 test
         Pocket.objects.get(user_id=partner.id, is_active=False).update(bank_account_type="NH", is_active=True)
-        response = partner_client.get(uri)
-        self.assertEqual(response.status_code, 200, "200 fail")
+        response = self.client.get(uri, **headers)
+        self.assertEqual(response.status_code, 200)
 
-        # 400 test
+        # USER_ALREADY_PARTICIPATE test
         purchase=Purchase.objects.create(
             user_id=partner,
             production=self.item
@@ -107,5 +112,46 @@ class ShopAPITests(TestCase):
             post_id=self.post,
             purchase=purchase
         )
-        response = partner_client.get(uri)
-        self.assertEqual(response.status_code, 400, "400 fail")
+        response = self.client.get(uri, **headers)
+        self.assertEqual(response.data['status'], 'USER_ALREADY_PARTICIPATE')
+
+    def test_ShopParticipateView_post(self):
+        uri = f'/shop/v1/{self.post.id}/participate/'
+        partner = User.objects.create_user('partner1', 'partner1@partner.com', 'partner123')
+        ptoken = Token.objects.create(user=partner)
+
+        headers = {
+            "HTTP_AUTHORIZATION": 'Token '+ptoken.key
+        }
+
+        purchase = Purchase.objects.create(
+            user_id=partner,
+            production=self.item
+        )
+
+        # POST_CANNOT_PARTICIPATE test
+        self.post.status = 'CLOSE'
+        self.post.save()
+        response = self.client.post(uri, format='json', **headers)
+        self.assertEqual(response.data['status'], "POST_CANNOT_PARTICIPATE")
+        self.post.status = 'FUNDING'
+        self.post.save()
+
+        # POSTER_CANNOT_PARTICIPATE test
+        response = self.client.post(uri, format='json', **self.headers)
+        self.assertEqual(response.data['status'], 'POSTER_CANNOT_PARTICIPATE')
+
+        # USER_ALREADY_PARTICIPATE test
+        participant = Participant.objects.create(
+            user=partner,
+            post_id=self.post,
+            purchase=purchase
+        )
+        response = self.client.post(uri, format='json', **headers)
+        self.assertEqual(response.data['status'], 'USER_ALREADY_PARTICIPATE')
+
+        # 200 OK
+        participant.delete()
+
+        response = self.client.post(uri, format='json', **headers)
+        self.assertEqual(response.data['status'], 'HTTP_200_OK')

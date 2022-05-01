@@ -31,7 +31,7 @@ class ValidationMixin:
         return szr
 
 
-class IntegrationMixin(
+class CoreMixin(
     HeaderMixin, ValidationMixin
 ):
     pass

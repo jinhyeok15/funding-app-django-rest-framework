@@ -56,3 +56,21 @@ class ItemCreateSerializer(ModelSerializer):
         fields = [
             'price', 'target_amount'
         ]
+
+
+class PurchaseCreateSerializer(ModelSerializer):
+
+    class Meta:
+        model = Purchase
+        fields = ['user_id', 'production']
+
+
+class ParticipantCreateSerializer(ModelSerializer):
+
+    class Meta:
+        model = Participant
+        fields = [
+            'user',
+            'post_id',
+            'purchase',
+        ]

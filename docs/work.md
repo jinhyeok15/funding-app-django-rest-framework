@@ -46,17 +46,23 @@
 + ShopPost item, poster populate하기
 
 ## 4.27
+
 + models refactoring && test case 수정 (test_create_item_post case 추가)
 + exceptions에 DateValidationError 추가
 
 ## 4.28
+
 + POST shop/v1/post v1.0.0 update
 + user pocket validation 추가
 
 ## 4.30
+
 + GET shop/v1/:post_id/want_participate/ update
 
-## 4.31
+## 5.1
+
++ POST shop/v1/:post_id/participate/ 개발
++ mixins refactoring
 - signin API
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id

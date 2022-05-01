@@ -1,7 +1,7 @@
 from django.db import models
 from funding.apps.user.models import User
 from ..exceptions import DoesNotIncludeStatusError
-from typing import List
+from .validators import *
 
 
 class TimeStampBaseModel(models.Model):
@@ -54,8 +54,8 @@ class PostBaseModel(TimeStampBaseModel):
     updated_at: 수정일자
     """
     poster = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=50, blank=False)
-    content = models.TextField(blank=False)
+    title = models.CharField(max_length=50)
+    content = models.TextField()
 
     class Meta:
         ordering = ['created_at']

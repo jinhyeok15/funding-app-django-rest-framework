@@ -1,37 +1,44 @@
-from funding.apps.core.views import IntegrationMixin as CoreIntegrationMixin
 from funding.apps.core.exceptions import (
-    DoesNotExistedUserPocketError,
     UserAlreadyParticipateError,
+    PostCannotParticipateError,
+    PosterCannotParticipateError,
 )
 
 from django.core.exceptions import ObjectDoesNotExist
-from funding.apps.user.models import Pocket
-from ..models import Participant
+from ..models import *
+from funding.apps.user.models import User
 
 
 class ShopValidationMixin:
-    def get_valid_user_pocket(self, user_id):
-        try:
-            pocket = Pocket.objects.get(user_id=user_id)
-            return pocket
-        except ObjectDoesNotExist:
-            raise DoesNotExistedUserPocketError(user_id)
-    
     def validate_unparticipated_user(self, user_id, post_id):
         try:
-            participant = Participant.objects.get(user_id=user_id, post_id=post_id)
+            user = User.objects.get(pk=user_id)
+            post = Post.objects.get(pk=post_id)
+            Participant.objects.get(user=user, post_id=post)
             raise UserAlreadyParticipateError(user_id, post_id)
         except ObjectDoesNotExist:
-            return None
+            pass
     
+    def validate_user_not_poster(self, user_id, post_id):
+        try:
+            user = User.objects.get(pk=user_id)
+            Post.objects.get(pk=post_id, poster=user)
+            raise PosterCannotParticipateError(user_id)
+        except ObjectDoesNotExist:
+            pass
+
 
 class ShopCRUDMixin:
-    pass
+    def get_item_by_post_id_to_participate(self, post_id):
+        try:
+            post = Post.objects.get(pk=post_id, status="FUNDING")
+            return post.item
+        except ObjectDoesNotExist:
+            raise PostCannotParticipateError(post_id)
 
 
-class IntegrationMixin(
+class ShopMixin(
     ShopValidationMixin,
-    ShopCRUDMixin,
-    CoreIntegrationMixin
+    ShopCRUDMixin
 ):
     pass

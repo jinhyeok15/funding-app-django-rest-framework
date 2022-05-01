@@ -1,10 +1,13 @@
+import json
 from drf_yasg import openapi
 from drf_yasg.openapi import *
 from drf_yasg.openapi import Parameter
-from funding.apps.core.views import get_status_by_code
+from funding.apps.core.views import get_status_by_code, GenericResponse as Response, HttpStatus
 from funding.apps.shop.serializers import ShopPostSerializer
+from funding.apps.user.serializers import PocketSerializer
 from funding.apps.core.exceptions import (
-    DoesNotExistedUserPocketError
+    DoesNotExistedUserPocketError,
+    UserAlreadyParticipateError
 )
 
 AUTH_TOKEN_PARAMETER = Parameter('Authorization', openapi.IN_HEADER, description="유저 토큰 -> Token {your token}", type=openapi.TYPE_STRING)
@@ -45,6 +48,7 @@ SHOP_POST_ITEM_CREATE_LOGIC = {
     "responses": {
         201: ShopPostSerializer,
         400: get_status_by_code(400),
+        200: DoesNotExistedUserPocketError.status,
         401: get_status_by_code(401)
     }
 }
@@ -56,10 +60,23 @@ SHOP_WANT_PARTICIPATE_LOGIC = {
         AUTH_TOKEN_PARAMETER
     ],
     "responses": {
-        100: get_status_by_code(100),
-        400: get_status_by_code(400),
+        200: PocketSerializer,
+        400: UserAlreadyParticipateError.status,
         401: get_status_by_code(401),
-        422: DoesNotExistedUserPocketError(0).message
+        200: DoesNotExistedUserPocketError.status
+    }
+}
+
+
+SHOP_POST_PARTICIPATE_LOGIC = {
+    "manual_parameters": [
+        POST_ID_PATH_PARAMETER,
+        AUTH_TOKEN_PARAMETER
+    ],
+    "responses": {
+        200: get_status_by_code(200),
+        401: get_status_by_code(401),
+        400: get_status_by_code(400)
     }
 }
 

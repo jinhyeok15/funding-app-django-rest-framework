@@ -1,32 +1,57 @@
 from rest_framework.views import APIView
+
+# serializers
 from ..serializers import *
 from funding.apps.user.serializers import (
     PocketSerializer as UserPocketSerializer
 )
+
+# API swagger schema
 from ..schemas import *
+from drf_yasg.utils import swagger_auto_schema
+
+# user permissions
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
-# 트랜잭션 참조
-# https://docs.djangoproject.com/en/3.0/topics/db/transactions/#django.db.transaction.atomic
+from funding.apps.core.views.decorators import authorize
+
+# transaction
 from django.db import transaction
+
+# exceptions
 from funding.apps.core.exceptions import (
     SerializerValidationError,
     DoesNotExistedUserPocketError,
-    UserAlreadyParticipateError
+    UserAlreadyParticipateError,
+    PostCannotParticipateError,
+    PosterCannotParticipateError
 )
-from funding.apps.core.views import (
-    GenericResponse as Response, HttpStatus
+
+# response
+from funding.apps.core.views.response import (
+    GenericResponse as Response, HttpStatus,
 )
-from .mixins import IntegrationMixin
-from drf_yasg.utils import swagger_auto_schema
+
+# views mixins
+from .mixins import (
+    ShopMixin
+)
+from funding.apps.core.views.mixins import CoreMixin
+from funding.apps.user.views.mixins import UserMixin
 
 
-class ShopPostItemView(IntegrationMixin, APIView):
+class ShopPostItemView(
+    ShopMixin,
+    UserMixin,
+    CoreMixin,
+    APIView
+):
 
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(**SHOP_POST_ITEM_CREATE_LOGIC)
+    @authorize
     @transaction.atomic()
-    def post(self, request):
+    def post(self, request, poster_id):
         """
         # 펀딩 게시글 생성 API v1.0.0
 
@@ -56,10 +81,9 @@ class ShopPostItemView(IntegrationMixin, APIView):
         response에서는 client에서 사용할 게시물 id와 게시자 id, item id를 제공하여 client 측에서 접근할 수 있도록 하였습니다.
         """
 
-        poster_id = self.get_auth_user(request)
-
         # create session
         sid = transaction.savepoint()
+
         try:
             self.get_valid_user_pocket(poster_id)
 
@@ -76,12 +100,15 @@ class ShopPostItemView(IntegrationMixin, APIView):
                 }
             )
             post = serializer.save()
+
         except SerializerValidationError as e:
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
+
         except DoesNotExistedUserPocketError as e:
             transaction.savepoint_rollback(sid)
-            return Response(None, HttpStatus(422, error=e))
+            return Response(None, HttpStatus(200, error=e))
+
         # end session
         transaction.savepoint_commit(sid)
 
@@ -90,12 +117,18 @@ class ShopPostItemView(IntegrationMixin, APIView):
         return Response(response_body.data, HttpStatus(201, message="생성완료"))
 
 
-class ShopWantParticipateView(IntegrationMixin, APIView):
+class ShopWantParticipateView(
+    ShopMixin,
+    UserMixin,
+    CoreMixin,
+    APIView
+):
     
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(**SHOP_WANT_PARTICIPATE_LOGIC)
-    def get(self, request, post_id):
+    @authorize
+    def get(self, request, user_id, post_id):
         """
         # 펀딩 상품 참여 가능 여부 체크 API
 
@@ -109,18 +142,76 @@ class ShopWantParticipateView(IntegrationMixin, APIView):
         
         1. 유저 지갑 개설 여부 조회(is_active) 후, 개설이 되어 있을 경우 결제 진행.
     
-        2. 유저가 이미 참여를 한 경우 ValidationError
+        2. 유저가 이미 참여를 한 경우 400 ValidationError
         """
-
-        user_id = self.get_auth_user(request)
 
         try:
             self.validate_unparticipated_user(user_id, post_id)
             pocket = self.get_valid_user_pocket(user_id)
             response_body = UserPocketSerializer(pocket)
+
         except DoesNotExistedUserPocketError as e:
-            return Response(None, HttpStatus(422, error=e))
+            return Response(None, HttpStatus(200, error=e))
+
         except UserAlreadyParticipateError as e:
             return Response(None, HttpStatus(400, error=e))
 
         return Response({"pocket":response_body.data}, HttpStatus(200, "OK"))
+
+
+class ShopPostParticipateView(
+    ShopMixin,
+    CoreMixin,
+    APIView
+):
+    
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(**SHOP_POST_PARTICIPATE_LOGIC)
+    @authorize
+    @transaction.atomic()
+    def post(self, request, user_id, post_id):
+        """
+        # 펀딩 상품 참여 등록 API
+
+        ## 개요
+
+        - 유저가 결제를 성공할 경우에, 결제 내역을 기록하고, 유저 참여 여부를 등록한다.
+
+        ## 필수요건
+
+        1. 유저가 이미 참여를 한 경우 400 ValidationError
+        2. 유저가 아닌 게시자의 경우 참여 불가
+        3. 결제 내역 기록, 유저 참여 여부 등록 transaction 구성
+        """
+
+        sid = transaction.savepoint()
+
+        try:
+            self.validate_unparticipated_user(user_id, post_id)
+            self.validate_user_not_poster(user_id, post_id)
+
+            item = self.get_item_by_post_id_to_participate(post_id)
+            purchase = self.get_valid_szr(PurchaseCreateSerializer, data={
+                "user_id": user_id, "production": item.id
+            }).save()
+            self.get_valid_szr(ParticipantCreateSerializer, data={
+                "user": user_id,
+                "post_id": post_id,
+                "purchase": purchase.id
+            }).save()
+
+        except UserAlreadyParticipateError as e:
+            return Response(None, HttpStatus(400, error=e))
+
+        except PostCannotParticipateError as e:
+            return Response(None, HttpStatus(400, error=e))
+        
+        except PosterCannotParticipateError as e:
+            return Response(None, HttpStatus(400, error=e))
+
+        except SerializerValidationError as e:
+            transaction.savepoint_rollback(sid)
+            return Response(None, HttpStatus(400, error=e))
+        
+        return Response(None, HttpStatus(200, "OK"))

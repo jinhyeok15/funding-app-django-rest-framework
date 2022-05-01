@@ -19,7 +19,7 @@ class Item(ItemBaseModel):
 
 class Post(PostBaseModel):
     item = models.OneToOneField(Item, on_delete=models.CASCADE)
-    poster_name = models.CharField(max_length=50, blank=False)
+    poster_name = models.CharField(max_length=50)
     final_date = models.CharField(max_length=25, validators=[validate_final_date_component])
     status = models.CharField(max_length=12, default='FUNDING', help_text='''
         SUCCESS는 펀딩이 성공적으로 진행되어 상품 준비단계까지 진행된 상태이며, 
