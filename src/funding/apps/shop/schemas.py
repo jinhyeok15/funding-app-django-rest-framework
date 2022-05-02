@@ -8,6 +8,7 @@ from funding.apps.user.serializers import PocketSerializer
 from funding.apps.core.exceptions import (
     DoesNotExistedUserPocketError,
     PostDoesNotExistError,
+    PosterCannotParticipateError,
     UserAlreadyParticipateError
 )
 
@@ -64,7 +65,8 @@ SHOP_WANT_PARTICIPATE_LOGIC = {
         200: PocketSerializer,
         400: UserAlreadyParticipateError.status,
         401: get_status_by_code(401),
-        200: DoesNotExistedUserPocketError.status
+        200: DoesNotExistedUserPocketError.status,
+        400: PosterCannotParticipateError.status
     }
 }
 

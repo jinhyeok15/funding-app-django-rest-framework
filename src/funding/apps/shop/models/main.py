@@ -31,7 +31,8 @@ class Post(PostBaseModel):
         ('SUCCESS', '성공'),
         ('FUNDING', '진행중'),
         ('CANCEL', '취소'),
-        ('CLOSE', '펀딩종료')
+        ('CLOSE', '펀딩종료'),
+        ('DELETE', '삭제')
     ])
 
     # ref: https://stackoverflow.com/questions/30752268/how-to-filter-objects-for-count-annotation-in-django

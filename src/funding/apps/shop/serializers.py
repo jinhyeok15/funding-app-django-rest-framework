@@ -4,6 +4,7 @@ from rest_framework import serializers
 from funding.apps.user.serializers import UserSerializer
 from .models import *
 from drf_yasg.utils import swagger_serializer_method
+from funding.apps.core.components.date import DateComponent
 
 
 class ItemSerializer(ModelSerializer):
@@ -17,6 +18,8 @@ class ShopPostSerializer(ModelSerializer):
     item = serializers.SerializerMethodField()
     poster = serializers.SerializerMethodField()
     participant_count = serializers.SerializerMethodField()
+    all_funding_amount = serializers.SerializerMethodField()
+    d_day = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -28,8 +31,8 @@ class ShopPostSerializer(ModelSerializer):
             'poster_name',
             'status',
             'participant_count',
-            'created_at',
-            'updated_at'
+            'all_funding_amount',
+            'd_day'
         ]
 
     @swagger_serializer_method(serializer_or_field=ItemSerializer)
@@ -42,6 +45,13 @@ class ShopPostSerializer(ModelSerializer):
     
     def get_participant_count(self, obj):
         return obj.participants.count()
+
+    def get_all_funding_amount(self, obj):
+        return obj.item.price * obj.participants.count()
+    
+    def get_d_day(self, obj):
+        final_date_comp = DateComponent(obj.final_date)
+        return final_date_comp.get_d_day()
 
 
 class ShopPostCreateSerializer(ModelSerializer):

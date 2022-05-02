@@ -113,9 +113,7 @@ class ShopPostItemView(
         # end session
         transaction.savepoint_commit(sid)
 
-        response_body = ShopPostSerializer(post)
-
-        return Response(response_body.data, HttpStatus(201, message="생성완료"))
+        return Response(None, HttpStatus(201, message="생성완료"))
 
 
 class ShopWantParticipateView(
@@ -148,6 +146,7 @@ class ShopWantParticipateView(
 
         try:
             self.validate_unparticipated_user(user_id, post_id)
+            self.validate_user_not_poster(user_id, post_id)
             pocket = self.get_valid_user_pocket(user_id)
             response_body = UserPocketSerializer(pocket)
 
@@ -155,6 +154,9 @@ class ShopWantParticipateView(
             return Response(None, HttpStatus(200, error=e))
 
         except UserAlreadyParticipateError as e:
+            return Response(None, HttpStatus(400, error=e))
+        
+        except PosterCannotParticipateError as e:
             return Response(None, HttpStatus(400, error=e))
 
         return Response({"pocket":response_body.data}, HttpStatus(200, "OK"))

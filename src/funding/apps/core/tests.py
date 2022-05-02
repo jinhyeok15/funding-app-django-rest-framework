@@ -34,3 +34,12 @@ class CoreViewTests(TestCase):
         self.assertRaises(ValueError, date.FinalDateComponent, str_date=str_date)
         str_date = "3340,01,03"
         self.assertRaises(ValueError, date.FinalDateComponent, str_date=str_date)
+    
+    def test_FinalDateComponent_get_d_day(self):
+        now_date = "2022-05-02"
+        str_date = "2022-05-05"
+        
+        target = date.FinalDateComponent(str_date)
+        now = date.FinalDateComponent(now_date)
+
+        self.assertEqual((target.as_date()-now.as_date()).days, 3)

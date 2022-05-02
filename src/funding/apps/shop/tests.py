@@ -1,6 +1,5 @@
 from django.test import TestCase
-from rest_framework.test import APIClient
-from rest_framework.test import APITestCase, URLPatternsTestCase
+from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from .models import *
 from funding.apps.user.models import User, Pocket
@@ -8,6 +7,7 @@ from funding.apps.core.exceptions import (
     DoesNotIncludeStatusError,
     UserAlreadyParticipateError
 )
+from funding.apps.core.components.date import DateComponent
 
 
 class ShopModelTests(TestCase):
@@ -45,13 +45,16 @@ class ShopAPITests(APITestCase):
             price=4500,
             target_amount=600000
         )
+
+        self.fin_date = DateComponent('2022-07-10')
+        
         self.post = Post.objects.create(
             poster=self.user,
             title="hi hi hi",
             content="nice to meet you",
             item=self.item,
             poster_name="jj",
-            final_date="2022.07.10"
+            final_date=str(self.fin_date)
         )
 
     def test_ShopPostItemView_post(self):
@@ -92,6 +95,10 @@ class ShopAPITests(APITestCase):
         headers = {
             "HTTP_AUTHORIZATION": 'Token '+ptoken.key
         }
+
+        # POSTER_CANNOT_PARTICIPATE test
+        response = self.client.get(uri, **self.headers)
+        self.assertEqual(response.data['status'], 'POSTER_CANNOT_PARTICIPATE')
 
         # DOES_NOT_EXIST_USER_POCKET test
         response = self.client.get(uri, **headers)
@@ -171,6 +178,8 @@ class ShopAPITests(APITestCase):
         # 200 OK test
         response = self.client.get(uri)
         self.assertEqual(response.data['data']['participant_count'], 3)
+        self.assertEqual(response.data['data']['all_funding_amount'], 13500)
+        self.assertEqual(response.data['data']['d_day'], self.fin_date.get_d_day())
         self.assertEqual(response.status_code, 200)
 
         # POST_DOES_NOT_EXIST test
