@@ -63,8 +63,11 @@
 
 + POST shop/v1/:post_id/participate/ 개발
 + mixins refactoring
+
+## 5.2
+
++ GET shop/v1/post/:post_id
 - signin API
 - PATCH shop/post/:post_id
 - DELETE shop/post/:post_id
 - GET shop/posts/
-- GET shop/post/:post_id

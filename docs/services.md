@@ -221,11 +221,11 @@ Connect
 
 response에서는 client에서 사용할 게시물 id와 게시자 id, item id를 제공하여 client 측에서 접근할 수 있도록 하였습니다.
 
-### 3. PATCH shop/:post_id/
+### 3. PATCH shop/post/:post_id/
 
-### 4. DELETE shop/:post_id/
+### 4. DELETE shop/post/:post_id/
 
-### 5. GET shop/:post_id/
+### 5. GET shop/v1/post/:post_id/
 
 ### 6. GET shop/posts/
 

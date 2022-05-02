@@ -15,7 +15,7 @@
 ### Framework
 
 * django
-* django_restframwork(DRF)
+* django_restframework(DRF)
 
 ### Library
 
