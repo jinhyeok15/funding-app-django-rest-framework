@@ -19,11 +19,12 @@ from django.db import transaction
 
 # exceptions
 from funding.apps.core.exceptions import (
+    PostDoesNotExistError,
     SerializerValidationError,
     DoesNotExistedUserPocketError,
     UserAlreadyParticipateError,
     PostCannotParticipateError,
-    PosterCannotParticipateError
+    PosterCannotParticipateError,
 )
 
 # response
@@ -215,3 +216,32 @@ class ShopPostParticipateView(
             return Response(None, HttpStatus(400, error=e))
         
         return Response(None, HttpStatus(200, "OK"))
+
+
+class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
+
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(**SHOP_POST_DETAIL_READ_LOGIC)
+    def get(self, request, post_id):
+        """
+        # 펀딩 상품 상세 조회 API
+
+        ## 개요
+
+        - 상품 상세 페이지를 가져옵니다.
+        - 제목, 게시자명, 총펀딩금액, 달성률, D-day(펀딩 종료일까지), 상품설명, 목표금액 및 참여자 수가 포함되어야 합니다.
+
+        ## 필수요건
+
+        1. post_id를 통해 조회하는 post의 status 중 CLOSE는 포함하지 않는다.
+        2. 참여자 수를 계산해야 한다.
+        """
+
+        try:
+            post = self.get_activate_post(post_id)
+            serializer = ShopPostSerializer(post)
+            return Response(serializer.data, HttpStatus(200, "OK"))
+        
+        except PostDoesNotExistError as e:
+            return Response(None, HttpStatus(404, error=e))

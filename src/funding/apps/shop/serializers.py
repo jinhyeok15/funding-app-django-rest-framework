@@ -16,10 +16,21 @@ class ItemSerializer(ModelSerializer):
 class ShopPostSerializer(ModelSerializer):
     item = serializers.SerializerMethodField()
     poster = serializers.SerializerMethodField()
+    participant_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = [
+            'poster',
+            'title',
+            'content',
+            'item',
+            'poster_name',
+            'status',
+            'participant_count',
+            'created_at',
+            'updated_at'
+        ]
 
     @swagger_serializer_method(serializer_or_field=ItemSerializer)
     def get_item(self, obj):
@@ -28,6 +39,9 @@ class ShopPostSerializer(ModelSerializer):
     @swagger_serializer_method(serializer_or_field=UserSerializer)
     def get_poster(self, obj):
         return UserSerializer(obj.poster).data
+    
+    def get_participant_count(self, obj):
+        return obj.participants.count()
 
 
 class ShopPostCreateSerializer(ModelSerializer):

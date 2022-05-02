@@ -35,7 +35,7 @@ class Post(PostBaseModel):
     ])
 
     # ref: https://stackoverflow.com/questions/30752268/how-to-filter-objects-for-count-annotation-in-django
-    def show_list(self):
+    def participant_count(self):
         return self.objects.annotate(
             participants_count=models.Count('participants')
         )

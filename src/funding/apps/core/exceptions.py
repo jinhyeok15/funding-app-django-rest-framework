@@ -64,3 +64,13 @@ class PosterCannotParticipateError(DjangoValidationError):
     def __init__(self, user_id):
         self.message = "게시자는 참여할 수 없습니다."
         super().__init__(self.message, {"poster": user_id})
+
+
+class PostDoesNotExistError(DjangoValidationError):
+    """
+    게시물이 존재하지 않습니다.
+    """
+    status = "POST_DOES_NOT_EXIST"
+    def __init__(self, post_id):
+        self.message = "게시물이 존재하지 않습니다."
+        super().__init__(self.message, {"post_id": post_id})

@@ -7,6 +7,7 @@ from funding.apps.shop.serializers import ShopPostSerializer
 from funding.apps.user.serializers import PocketSerializer
 from funding.apps.core.exceptions import (
     DoesNotExistedUserPocketError,
+    PostDoesNotExistError,
     UserAlreadyParticipateError
 )
 
@@ -84,10 +85,9 @@ SHOP_POST_PARTICIPATE_LOGIC = {
 SHOP_POST_DETAIL_READ_LOGIC = {
     "manual_parameters": [
         POST_ID_PATH_PARAMETER,
-        AUTH_TOKEN_PARAMETER
     ],
     "responses": {
-        200: "조회완료",
-        401: get_status_by_code(401),
+        200: ShopPostSerializer,
+        400: PostDoesNotExistError.status
     }
 }

@@ -13,7 +13,7 @@ class UserValidationMixin:
 class UserCRUDMixin:
     def get_valid_user_pocket(self, user_id):
         try:
-            pocket = Pocket.objects.get(user_id=user_id)
+            pocket = Pocket.objects.get(user_id=user_id, is_active=True)
             return pocket
         except ObjectDoesNotExist:
             raise DoesNotExistedUserPocketError(user_id)

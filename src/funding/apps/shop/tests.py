@@ -155,3 +155,28 @@ class ShopAPITests(APITestCase):
 
         response = self.client.post(uri, format='json', **headers)
         self.assertEqual(response.data['status'], 'HTTP_200_OK')
+
+    def test_ShopPostDetailView_get(self):
+        uri = f'/shop/v1/post/{self.post.id}/'
+        num = 3
+        for i in range(num):
+            info = (f'user{i}', f'user{i}.user.com', 'user1234')
+            user = User.objects.create_user(*info)
+            Token.objects.create(user=user)
+
+            Pocket.objects.get(user_id=user.id, is_active=False).update(bank_account_type="NH", is_active=True)
+            purchase = Purchase.objects.create(user_id=user, production=self.item)
+            Participant.objects.create(user=user, post_id=self.post, purchase=purchase)
+
+        # 200 OK test
+        response = self.client.get(uri)
+        self.assertEqual(response.data['data']['participant_count'], 3)
+        self.assertEqual(response.status_code, 200)
+
+        # POST_DOES_NOT_EXIST test
+        self.post.status='CANCEL'
+        self.post.save()
+        response = self.client.get(uri)
+        self.assertEqual(response.data['status'], 'POST_DOES_NOT_EXIST')
+        self.post.status='FUNDING'
+        self.post.save()
