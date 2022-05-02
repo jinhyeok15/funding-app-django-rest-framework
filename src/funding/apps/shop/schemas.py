@@ -3,7 +3,7 @@ from drf_yasg import openapi
 from drf_yasg.openapi import *
 from drf_yasg.openapi import Parameter
 from funding.apps.core.views import get_status_by_code, GenericResponse as Response, HttpStatus
-from funding.apps.shop.serializers import ShopPostSerializer
+from funding.apps.shop.serializers import *
 from funding.apps.user.serializers import PocketSerializer
 from funding.apps.core.exceptions import (
     DoesNotExistedUserPocketError,
@@ -48,7 +48,7 @@ SHOP_POST_ITEM_CREATE_LOGIC = {
         AUTH_TOKEN_PARAMETER
     ],
     "responses": {
-        201: ShopPostSerializer,
+        201: PostSerializer,
         400: get_status_by_code(400),
         200: DoesNotExistedUserPocketError.status,
         401: get_status_by_code(401)
@@ -89,7 +89,7 @@ SHOP_POST_DETAIL_READ_LOGIC = {
         POST_ID_PATH_PARAMETER,
     ],
     "responses": {
-        200: ShopPostSerializer,
+        200: ShopPostDetailSerializer,
         400: PostDoesNotExistError.status
     }
 }

@@ -113,7 +113,9 @@ class ShopPostItemView(
         # end session
         transaction.savepoint_commit(sid)
 
-        return Response(None, HttpStatus(201, message="생성완료"))
+        response_body = PostSerializer(post)
+
+        return Response(response_body.data, HttpStatus(201, message="생성완료"))
 
 
 class ShopWantParticipateView(
@@ -242,7 +244,7 @@ class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
 
         try:
             post = self.get_activate_post(post_id)
-            serializer = ShopPostSerializer(post)
+            serializer = ShopPostDetailSerializer(post)
             return Response(serializer.data, HttpStatus(200, "OK"))
         
         except PostDoesNotExistError as e:
