@@ -177,9 +177,10 @@ class ShopAPITests(APITestCase):
 
         # 200 OK test
         response = self.client.get(uri)
-        self.assertEqual(response.data['data']['participant_count'], 3)
-        self.assertEqual(response.data['data']['all_funding_amount'], 13500)
+        self.assertEqual(response.data['data']['participant_count'], num)
+        self.assertEqual(response.data['data']['all_funding_amount'], 4500*num)
         self.assertEqual(response.data['data']['d_day'], self.fin_date.get_d_day())
+        self.assertEqual(response.data['data']['success_rate'], (4500*num/600000)*100)
         self.assertEqual(response.status_code, 200)
 
         # POST_DOES_NOT_EXIST test
@@ -189,3 +190,33 @@ class ShopAPITests(APITestCase):
         self.assertEqual(response.data['status'], 'POST_DOES_NOT_EXIST')
         self.post.status='FUNDING'
         self.post.save()
+    
+    def test_ShopPostDetailView_patch(self):
+        uri = f'/shop/v1/post/{self.post.id}/'
+        request_data = {
+            'title': '안녕하세요?',
+            'poster_name': '이진헉',
+            'price': 13500
+        }
+        partner = User.objects.create_user('partner1', 'partner1@partner.com', 'partner123')
+        ptoken = Token.objects.create(user=partner)
+
+        headers = {
+            "HTTP_AUTHORIZATION": 'Token '+ptoken.key
+        }
+
+        # USER_CANNOT_MODIFY_POST test
+        response = self.client.patch(uri, request_data, **headers)
+        self.assertEqual(response.data['status'], 'USER_CANNOT_MODIFY_POST')
+
+        # 201 test
+        response = self.client.patch(uri, request_data, **self.headers)
+        post = Post.objects.get(pk=self.post.id)
+        self.assertEqual(post.title, '안녕하세요?')
+        self.assertEqual(post.item.price, 13500)
+        self.assertEqual(response.status_code, 201)
+
+        # target_amount를 수정시 400 test
+        request_data['target_amount'] = 150000
+        response = self.client.patch(uri, request_data, **self.headers)
+        self.assertEqual(response.data['status'], 'CANNOT_WRITE')

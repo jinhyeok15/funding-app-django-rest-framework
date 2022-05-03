@@ -19,6 +19,16 @@ class FinalDateValidationError(DjangoValidationError):
         super().__init__(self.message, {"date": value})
 
 
+class CannotWriteError(DjangoValidationError):
+    """
+    Read-only-field cannot write
+    """
+    status = "CANNOT_WRITE"
+    def __init__(self, code):
+        self.message = "Read-only-field cannot write"
+        super().__init__(self.message, code)
+
+
 # user
 class DoesNotExistedUserPocketError(DjangoValidationError):
     """
@@ -74,3 +84,13 @@ class PostDoesNotExistError(DjangoValidationError):
     def __init__(self, post_id):
         self.message = "게시물이 존재하지 않습니다."
         super().__init__(self.message, {"post_id": post_id})
+
+
+class UserCannotModifyPostError(DjangoValidationError):
+    """
+    게시물 수정 권한이 없습니다.
+    """
+    status = "USER_CANNOT_MODIFY_POST"
+    def __init__(self, user_id, post_id):
+        self.message = "게시물 수정 권한이 없습니다."
+        super().__init__(self.message, {"user_id": user_id, "post_id": post_id})

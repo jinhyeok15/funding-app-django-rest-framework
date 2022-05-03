@@ -3,11 +3,11 @@ from funding.apps.core.exceptions import (
     PostCannotParticipateError,
     PosterCannotParticipateError,
     PostDoesNotExistError,
+    UserCannotModifyPostError,
 )
 
 from django.core.exceptions import ObjectDoesNotExist
 from ..models import *
-from funding.apps.user.models import User
 
 
 class ShopValidationMixin:
@@ -24,6 +24,13 @@ class ShopValidationMixin:
             raise PosterCannotParticipateError(user_id)
         except ObjectDoesNotExist:
             pass
+    
+    def validate_poster(self, user_id, post_id):
+        try:
+            Post.objects.get(pk=post_id, poster=user_id)
+            pass
+        except ObjectDoesNotExist:
+            raise UserCannotModifyPostError(user_id, post_id)
 
 
 class ShopCRUDMixin:
@@ -34,12 +41,20 @@ class ShopCRUDMixin:
         except ObjectDoesNotExist:
             raise PostCannotParticipateError(post_id)
     
-    def get_activate_post(self, post_id):
+    def get_active_post(self, post_id):
         try:
             post = Post.objects.get(pk=post_id, status__in=['FUNDING', 'SUCCESS', 'CLOSE'])
             return post
         except ObjectDoesNotExist:
             raise PostDoesNotExistError(post_id)
+    
+    def get_item_by_post_id(self, post_id):
+        try:
+            post = Post.objects.get(pk=post_id)
+            return Item.objects.get(pk=post.item.id)
+        except ObjectDoesNotExist:
+            raise PostDoesNotExistError(post_id)
+
 
 class ShopMixin(
     ShopValidationMixin,

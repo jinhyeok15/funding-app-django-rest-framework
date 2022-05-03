@@ -67,7 +67,10 @@
 ## 5.2
 
 + GET shop/v1/post/:post_id
+
+## 5.3
+
 - signin API
-- PATCH shop/post/:post_id
++ PATCH shop/v1/post/:post_id
 - DELETE shop/post/:post_id
 - GET shop/posts/

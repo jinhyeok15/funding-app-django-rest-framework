@@ -1,10 +1,13 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import Serializer, ModelSerializer
 from rest_framework import serializers
 
 from funding.apps.user.serializers import UserSerializer
 from .models import *
+from funding.apps.user.models import User
 from drf_yasg.utils import swagger_serializer_method
 from funding.apps.core.components.date import DateComponent
+
+from funding.apps.core.exceptions import CannotWriteError
 
 
 class ItemSerializer(ModelSerializer):
@@ -12,6 +15,7 @@ class ItemSerializer(ModelSerializer):
     class Meta:
         model = Item
         fields = '__all__'
+        read_only_fields = ['target_amount']
 
 
 class PostSerializer(ModelSerializer):
@@ -89,32 +93,51 @@ class ShopPostsReadSerializer(ShopPostMethod, ModelSerializer):
         ]
 
 
-class ShopPostCreateSerializer(ModelSerializer):
-    """
-    ## validation 목록
-    * final_date
-    DateComponentValidationError
-    """
+class ShopPostWriteSerializer(Serializer):
+    poster_id = serializers.IntegerField()
+    title = serializers.CharField()
+    poster_name = serializers.CharField()
+    content = serializers.CharField()
+    target_amount = serializers.IntegerField()
+    final_date = serializers.CharField()
+    price = serializers.IntegerField()
 
-    class Meta:
-        model = Post
-        fields = [
-            'item',
-            'poster', 
-            'title', 
-            'content', 
-            'poster_name', 
-            'final_date'
-        ]
+    def create(self, validated_data):
+        target_amount = validated_data.get('target_amount')
+        price = validated_data.get('price')
+        item = Item.objects.create(target_amount=target_amount, price=price)
 
+        poster = User.objects.get(pk=validated_data.get('poster_id'))
+        title = validated_data.get('title')
+        poster_name = validated_data.get('poster_name')
+        content = validated_data.get('content')
+        final_date = validated_data.get('final_date')
+        post = Post.objects.create(item=item, poster=poster,
+            title=title,
+            poster_name=poster_name,
+            content=content,
+            final_date=final_date
+        )
 
-class ItemCreateSerializer(ModelSerializer):
+        return post
+    
+    def update(self, instance, validated_data):
+        target_amount = validated_data.get('target_amount', None)
+        if target_amount is not None:
+            raise CannotWriteError({
+                "target_amount": target_amount
+            })
+        instance.title = validated_data.get('title', instance.title)
+        instance.content = validated_data.get('content', instance.content)
+        instance.poster_name = validated_data.get('poster_name', instance.poster_name)
+        instance.final_date = validated_data.get('final_date', instance.final_date)
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
 
-    class Meta:
-        model = Item
-        fields = [
-            'price', 'target_amount'
-        ]
+        instance.item.price = validated_data.get('price', instance.item.price)
+        instance.item.save()
+
+        return instance
 
 
 class PurchaseCreateSerializer(ModelSerializer):

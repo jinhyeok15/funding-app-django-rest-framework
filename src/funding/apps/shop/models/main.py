@@ -25,21 +25,14 @@ class Post(PostBaseModel):
         SUCCESS는 펀딩이 성공적으로 진행되어 상품 준비단계까지 진행된 상태이며, 
         FUNDING는 펀딩이 진행중인 상태, 
         CLOSE는 펀딩이 종료된 상태, 
-        CANCEL는 펀딩 목표 금액을 넘지 못하여 펀딩이 취소된 상태를 의미한다. 
+        CANCEL는 게시자가 확인되지 않아 글 작성이 취소된 상태이다.
         결제는 DONATE단계에서 진행되며, CANCEL이 되면 결제 내역이 환불된다.
     ''', choices=[
         ('SUCCESS', '성공'),
         ('FUNDING', '진행중'),
         ('CANCEL', '취소'),
         ('CLOSE', '펀딩종료'),
-        ('DELETE', '삭제')
     ])
-
-    # ref: https://stackoverflow.com/questions/30752268/how-to-filter-objects-for-count-annotation-in-django
-    def participant_count(self):
-        return self.objects.annotate(
-            participants_count=models.Count('participants')
-        )
     
     class Meta:
         db_table = 'shop_posts'
