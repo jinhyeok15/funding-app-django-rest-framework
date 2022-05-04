@@ -70,7 +70,8 @@
 
 ## 5.3
 
-- signin API
 + PATCH shop/v1/post/:post_id
-- DELETE shop/post/:post_id
++ DELETE shop/v1/post/:post_id
 - GET shop/posts/
+
+- signin API

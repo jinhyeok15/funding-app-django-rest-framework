@@ -51,10 +51,18 @@ class ShopCRUDMixin:
     def get_item_by_post_id(self, post_id):
         try:
             post = Post.objects.get(pk=post_id)
-            return Item.objects.get(pk=post.item.id)
+            return post.item
         except ObjectDoesNotExist:
             raise PostDoesNotExistError(post_id)
-
+    
+    def delete_post(self, post_id):
+        """
+        펀딩 중인 상품을 삭제할 수 없음
+        """
+        try:
+            post = Post.objects.get(pk=post_id, status__in=['SUCCESS', 'CLOSE']).delete()
+        except ObjectDoesNotExist:
+            raise PostDoesNotExistError(post_id)
 
 class ShopMixin(
     ShopValidationMixin,

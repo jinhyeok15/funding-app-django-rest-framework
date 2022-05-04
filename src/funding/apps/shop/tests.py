@@ -220,3 +220,26 @@ class ShopAPITests(APITestCase):
         request_data['target_amount'] = 150000
         response = self.client.patch(uri, request_data, **self.headers)
         self.assertEqual(response.data['status'], 'CANNOT_WRITE')
+    
+    def test_ShopPostDetailView_delete(self):
+        user = User.objects.create_user('user1', 'user1@partner.com', 'user123')
+        utoken = Token.objects.create(user=user)
+
+        headers = {
+            "HTTP_AUTHORIZATION": 'Token '+utoken.key
+        }
+        item = Item.objects.create(price=150000, target_amount=100000000)
+        post = Post.objects.create(
+            poster=user, 
+            title="dkdkdk", 
+            content="fjfjjfjf", 
+            item=item, 
+            poster_name="jin", 
+            final_date="2023-04-26", 
+            status="SUCCESS")
+        
+        uri = f'/shop/v1/post/{post.id}/'
+
+        # 204 test
+        response = self.client.delete(uri, **headers)
+        self.assertEqual(response.status_code, 204)

@@ -17,6 +17,23 @@ AUTH_TOKEN_PARAMETER = Parameter('Authorization', openapi.IN_HEADER, description
 POST_ID_PATH_PARAMETER = Parameter("post_id", IN_PATH, required=True, type=TYPE_INTEGER)
 
 
+class ShopPostCreateSerializer(Serializer):
+    title = serializers.CharField()
+    poster_name = serializers.CharField()
+    content = serializers.CharField()
+    target_amount = serializers.IntegerField()
+    final_date = serializers.CharField()
+    price = serializers.IntegerField()
+
+
+class ShopPostUpdateSerializer(Serializer):
+    title = serializers.CharField()
+    poster_name = serializers.CharField()
+    content = serializers.CharField()
+    final_date = serializers.CharField()
+    price = serializers.IntegerField()
+
+
 SHOP_POST_ITEM_CREATE_LOGIC = {
     "operation_summary": "펀딩 게시글 생성 API v1.0.0",
     "operation_description": """
@@ -47,7 +64,7 @@ SHOP_POST_ITEM_CREATE_LOGIC = {
 
     response에서는 client에서 사용할 게시물 id와 게시자 id, item id를 제공하여 client 측에서 접근할 수 있도록 하였습니다.
     """,
-    "request_body": ShopPostWriteSerializer,
+    "request_body": ShopPostCreateSerializer,
     "manual_parameters": [
         AUTH_TOKEN_PARAMETER
     ],
@@ -159,7 +176,7 @@ SHOP_POST_DETAIL_UPDATE_LOGIC = {
     1. 게시자만 수정 가능합니다.
     2. post_id를 통해 조회하는 post의 status 중 CLOSE는 포함하지 않는다.
     """,
-    "request_body": ShopPostWriteSerializer,
+    "request_body": ShopPostUpdateSerializer,
     "manual_parameters": [
         POST_ID_PATH_PARAMETER,
         AUTH_TOKEN_PARAMETER
@@ -170,5 +187,32 @@ SHOP_POST_DETAIL_UPDATE_LOGIC = {
         400: UserCannotModifyPostError.status,
         404: PostDoesNotExistError.status,
         400: CannotWriteError.status
+    }
+}
+
+
+SHOP_POST_DETAIL_DELETE_LOGIC = {
+    "operation_summary": "펀딩 상품 상세 삭제 API",
+    "operation_description": """
+    # 펀딩 상품 상세 삭제 API
+
+    ## 개요
+
+    - 게시물 중 펀딩 중인 상품은 참여자들이 모두 결제가 완료된 상태이기 때문에, 삭제가 불가능합니다. 삭제 요청만 가능합니다.
+
+    - 삭제 요청을 보내면 DB에 내역이 삭제됩니다.
+
+    ## 필수요건
+
+    1. 게시자만 삭제 가능합니다.
+    2. post_id를 통해 조회하는 post의 status 중 CLOSE와 FUNDING은 포함하지 않는다.
+    """,
+    "manual_parameters": [
+        POST_ID_PATH_PARAMETER,
+        AUTH_TOKEN_PARAMETER
+    ],
+    "responses": {
+        204: get_status_by_code(204),
+        404: PostDoesNotExistError.status
     }
 }

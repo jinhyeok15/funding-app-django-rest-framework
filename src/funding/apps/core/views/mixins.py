@@ -1,4 +1,5 @@
 from rest_framework.authtoken.models import Token
+from rest_framework.fields import empty
 from ..exceptions import SerializerValidationError
 
 
@@ -19,7 +20,7 @@ class ValidationMixin:
     클라이언트 측 오류가 아닌 유저 쪽에서 입력 오류를 낼 수 있는 것들은 models쪽에서 validation하기엔 views쪽에서 구분해주어야 하는 경우가 있다.
     이런 경우, ValidationMixin에서 validation 처리를 해준다.
     """
-    def get_valid_szr(self, serializer, data, instance=None, **kwargs):
+    def get_valid_szr(self, serializer, data=empty, instance=None, **kwargs):
         """
         models 쪽 validation은 serializer에서 검증이 들어가 get_valid_szr을 통해 SerializerValidationError로 raise된다.
         serializer.is_valid()로 검증을 해주는 부분에 대한 method

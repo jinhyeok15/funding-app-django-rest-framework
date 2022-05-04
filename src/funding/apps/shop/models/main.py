@@ -60,7 +60,5 @@ class Participant(TimeStampBaseModel):
     purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE)
     is_join = models.BooleanField(default=True)
 
-    objects = ParticipantManager()
-
     class Meta:
         db_table = 'shop_participants'

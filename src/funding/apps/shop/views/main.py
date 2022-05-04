@@ -74,13 +74,14 @@ class ShopPostItemView(
 
         except DoesNotExistedUserPocketError as e:
             return Response(None, HttpStatus(200, error=e))
+        
+        else:
+            # end session
+            transaction.savepoint_commit(sid)
 
-        # end session
-        transaction.savepoint_commit(sid)
+            response_body = PostSerializer(post)
 
-        response_body = PostSerializer(post)
-
-        return Response(response_body.data, HttpStatus(201, message="생성완료"))
+            return Response(response_body.data, HttpStatus(201, message="생성완료"))
 
 
 class ShopWantParticipateView(
@@ -109,8 +110,9 @@ class ShopWantParticipateView(
         
         except PosterCannotParticipateError as e:
             return Response(None, HttpStatus(400, error=e))
-
-        return Response({"pocket":response_body.data}, HttpStatus(200, "OK"))
+        
+        else:
+            return Response({"pocket":response_body.data}, HttpStatus(200, "OK"))
 
 
 class ShopPostParticipateView(
@@ -155,10 +157,11 @@ class ShopPostParticipateView(
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
         
-        # end session
-        transaction.savepoint_commit(sid)
-        
-        return Response(None, HttpStatus(200, "OK"))
+        else:
+            # end session
+            transaction.savepoint_commit(sid)
+            
+            return Response(None, HttpStatus(200, "OK"))
 
 
 class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
@@ -173,8 +176,9 @@ class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
         
         except PostDoesNotExistError as e:
             return Response(None, HttpStatus(404, error=e))
-
-        return Response(serializer.data, HttpStatus(200, "OK"))
+        
+        else:
+            return Response(serializer.data, HttpStatus(200, "OK"))
 
     @swagger_auto_schema(**SHOP_POST_DETAIL_UPDATE_LOGIC)
     @authorize
@@ -204,7 +208,21 @@ class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
         except CannotWriteError as e:
             return Response(None, HttpStatus(400, error=e))
         
-        # end session
-        transaction.savepoint_commit(sid)
+        else:
+            # end session
+            transaction.savepoint_commit(sid)
+            
+            return Response(None, HttpStatus(201, "수정완료"))
+
+    @swagger_auto_schema()
+    @authorize
+    def delete(self, request, user_id, post_id):
+        try:
+            self.validate_poster(user_id, post_id)
+            self.delete_post(post_id)
         
-        return Response(None, HttpStatus(201, "수정완료"))
+        except PostDoesNotExistError as e:
+            return Response(None, HttpStatus(404, error=e))
+        
+        else:
+            return Response(None, HttpStatus(204))
