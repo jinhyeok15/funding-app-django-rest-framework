@@ -1,135 +1,14 @@
-# 구현하기
-
-## 목록
-
-* 서비스 분석
-  1. 개요
-  2. ~요구사항 => APIS와 병합~
-* 환경 세팅하기
-  1. 서버 환경 (stacks)
-  2. 로컬 실행
-  3. Swagger django 연동
-  4. TestCase 설정
-* API 구축
+# API 문서
   1. [POST account/signup/](#1-post-accountsignup)
   2. [POST shop/v1/post/](#2-post-shopv1post)
-  3. [PATCH shop/v1/:post_id/](#3-patch-shoppostpost_id)
-  4. [DELETE shop/v1/:post_id/](#4-delete-shopv1postpost_id)
-  5. [GET shop/v1/:post_id](#5-get-shopv1postpost_id)
+  3. [PATCH shop/v1/post/:post_id/](#3-patch-shoppostpost_id)
+  4. [DELETE shop/v1/post/:post_id/](#4-delete-shopv1postpost_id)
+  5. [GET shop/v1/post/:post_id](#5-get-shopv1postpost_id)
   6. [GET shop/v1/posts/](#6-get-shopv1posts)
-  7. [POST shop/v1/<int:post_id>/participate/](#7-get-shopv1intpost_idwant_participate)
-* 기타
-  1. [Commit 관련 정리](#commit-관련-정리)
-  2. [git commit convension](#git-commit-convention)
-  3. [Apply swagger schema](#apply-swagger-schema)
+  7. [GET shop/v1/<int:post_id>/want_participate/](#7-get-shopv1intpost_idwant_participate)
+  8. [POST shop/v1/<int:post_id>/participate/](#8-post-shopv1intpost_idparticipate)
 
-## 서비스 분석
-
-### 1. 개요
-
-* User type: 일반유저/게시자
-
-* 유저는 상품을 1회까지만 펀딩할 수 있다.
-
-* 유저는 결제할 수 있는 Pocket을 등록한 후 purchase할 수 있다.
-
-* ShopPost에는 status=SUCCESS/FUNDING/CLOSE/CANCEL 컬럼이 존재한다.
-SUCCESS는 펀딩이 성공적으로 진행되어 상품 준비단계까지 진행된 상태이며,
-FUNDING는 펀딩이 진행중인 상태,
-CLOSE는 펀딩이 종료된 상태,
-CANCEL는 펀딩 목표 금액을 넘지 못하여 펀딩이 취소된 상태를 의미한다.
-결제는 DONATE단계에서 진행되며, CANCEL이 되면 결제 내역이 환불된다.
-
-* 펀딩 shop 도메인에서 결제부분을 따로 빼는 것을 고려하였으나, 기존 앱에서 펀딩 shop 도메인을 추가하는 것이라면 shop 내부에서 purchase 내역을 관리하는 것이 좋을 것으로 판단하였음
-
-* ShopPurchaseLog에서 User, Item을 UniqueConstraint로 묶어서 관리해야 한다.(유저가 한개의 상품에 여러번 DONATE 불가능) 하지만 현재 Django 버전이 2.1.7로 UniqueConstraint는 공식문서에서 4.0 버전에서 다루는 것을 추천한다. 대안책으로 모델에서 post를 할 경우 get_or_create를 활용한다.
-
-* 앱은 유저 관련 info를 처리하는 profile과 펀딩 샵 부분을 담당하는 shop이 있습니다. 펀딩 샵과 다른 도메인 간의 재사용성을 고려하여, 일부 django 객체 및 components는 abstract 앱에서 관리합니다.
-
-> abstract model
-
-```python
-# apps/abstract/models
-
-from django.db import models
-from funding.apps.user.models import User
-
-
-class Post(models.Model):
-    poster = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=50)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['created_at']
-        abstract = True
-
-
-class PurchaseInterface(models.Model):
-    user: models.ForeignKey
-    production: models.ForeignKey
-
-    class Meta:
-        abstract = True
-
-
-class AbstractPostItem(models.Model):
-    title: models.CharField
-    poster_name: models.CharField
-    final_date: models.CharField
-    content: models.TextField
-    target_amount: models.IntegerField
-    price: models.IntegerField
-```
-
-## 2. 환경 세팅하기
-
-### 1. 서버 환경 (stacks)
-
-* Python 3.7
-* Django 2.1.7
-* DRF 3.11.0
-* postgresql(RDS)
-* Docker v18.09.2
-* Docker Compose v1.23.2
-
-서버 환경은 [realpython/dockerizing-django](https://github.com/realpython/dockerizing-django)를 기반으로 customizing하여 구축하였습니다.
-env파일에서 RDS세팅 관련 보안 문제가 있어, settings 파일에서 중요 부분을 따로 json으로 저장하여, jwt를 받아 conf.ini에 저장하였습니다.
-conf.ini파일은 aws S3에서 관리합니다.
-
-### 2. 로컬 실행
-
-S3 url에서 conf.ini 파일 다운로드. src/funding 디렉토리에 붙여넣기
-
-다음 명령어 실행
-
-``` shell
-cd src
-pip install -r requirements.txt
-python manage.py runserver
-```
-
-### 3. Swagger django 연동
-
-[참고](https://github.com/axnsan12/drf-yasg)
-
-Connect
-
-> 127.0.0.1:8000/swagger\
-> 127.0.0.1:8000/redoc
-
-### 4. TestCase 설정
-
-> [django test](https://docs.djangoproject.com/en/4.0/topics/testing/overview/)\
-> [drf test](https://www.django-rest-framework.org/api-guide/testing/)
-
-```python manage.py test```
-
-## 3. API 구축
-
-### 1. POST account/signup
+## 1. POST account/signup
 
 [참고: How to Implement Token Authentication using Django REST Framework](https://simpleisbetterthancomplex.com/tutorial/2018/11/22/how-to-implement-token-authentication-using-django-rest-framework.html)
 
@@ -146,9 +25,9 @@ Connect
 * Response(200)
 * Response(400)
 
-### 2. POST shop/v1/post/
+## 2. POST shop/v1/post/
 
-# 펀딩 게시글 생성 API
+* 펀딩 게시글 생성 API
 
 * 개요
 
@@ -175,7 +54,7 @@ Funding shop 도메인에서는 Item이 핵심인 게시물이겠지만, 이후 
 
 response에서는 client에서 사용할 게시물 id와 게시자 id, item id를 제공하여 client 측에서 접근할 수 있도록 하였습니다.
 
-### 3. PATCH shop/v1/post/:post_id/
+## 3. PATCH shop/v1/post/:post_id/
 
 * 펀딩 상품 상세 수정 API
 
@@ -188,7 +67,7 @@ response에서는 client에서 사용할 게시물 id와 게시자 id, item id�
 1. 게시자만 수정 가능합니다.
 2. post_id를 통해 조회하는 post의 status 중 CLOSE는 포함하지 않는다.
 
-### 4. DELETE shop/v1/post/:post_id/
+## 4. DELETE shop/v1/post/:post_id/
 
 * 펀딩 상품 상세 삭제 API
 
@@ -203,7 +82,7 @@ response에서는 client에서 사용할 게시물 id와 게시자 id, item id�
 1. 게시자만 삭제 가능합니다.
 2. post_id를 통해 조회하는 post의 status 중 CLOSE와 FUNDING은 포함하지 않는다.
 
-### 5. GET shop/v1/post/:post_id/
+## 5. GET shop/v1/post/:post_id/
 
 * 펀딩 상품 상세 조회 API
 
@@ -217,7 +96,7 @@ response에서는 client에서 사용할 게시물 id와 게시자 id, item id�
 1. post_id를 통해 조회하는 post의 status 중 CLOSE는 포함하지 않는다.
 2. 참여자 수를 계산해야 한다.
 
-### 6. GET shop/v1/posts/
+## 6. GET shop/v1/posts/
 
 * 펀딩 상품 전체 조회 API
 
@@ -235,7 +114,7 @@ response에서는 client에서 사용할 게시물 id와 게시자 id, item id�
 4. 총 펀딩금액 기준으로 정렬을 할 경우에는 serializer에서 sorting 해야함
 5. search 쿼리의 경우, 추후에 AWS ElasticSearch를 활용한다. 참조: http://labs.brandi.co.kr/2021/07/08/leekh.html
 
-### 7. GET shop/v1/<int:post_id>/want_participate/
+## 7. GET shop/v1/<int:post_id>/want_participate/
 
 * 펀딩 상품 참여 가능 여부 체크 API
 
@@ -251,7 +130,7 @@ response에서는 client에서 사용할 게시물 id와 게시자 id, item id�
 
 2. 유저가 이미 참여를 한 경우 400 ValidationError
 
-### 8. POST shop/v1/<int:post_id>/participate/
+## 8. POST shop/v1/<int:post_id>/participate/
 
 * 펀딩 상품 참여 등록 API
 
@@ -264,22 +143,3 @@ response에서는 client에서 사용할 게시물 id와 게시자 id, item id�
 1. 유저가 이미 참여를 한 경우 400 ValidationError
 2. 유저가 아닌 게시자의 경우 참여 불가
 3. 결제 내역 기록, 유저 참여 여부 등록 transaction 구성
-
-## 기타
-
-### Commit 관련 정리
-
-* [DEBUG] 디버그
-* [API] API 개발
-* [REFAC] 리팩토링
-* [ENV] 환경 설정
-* [DOC] 문서 관련 정리
-* [TEST] 테스트
-
-### git commit convention
-
-[https://www.conventionalcommits.org/en/v1.0.0/](https://www.conventionalcommits.org/en/v1.0.0/)
-
-### Apply swagger schema
-
-[https://drf-yasg.readthedocs.io/en/stable/custom_spec.html](https://drf-yasg.readthedocs.io/en/stable/custom_spec.html)

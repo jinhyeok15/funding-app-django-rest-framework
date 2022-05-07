@@ -82,3 +82,4 @@
 - post 생성, 조회 부분 수정
 - 배치 프로그래밍
 - 0 division error validation
+- 정렬시 status 우선 순위 고려, FUNDING->SUCCESS->CLOSE
