@@ -6,3 +6,4 @@ PyJWT
 drf-yasg==1.17.0
 django-redis-cache==3.0.1
 model_bakery
+django-cors-headers==3.1.0
