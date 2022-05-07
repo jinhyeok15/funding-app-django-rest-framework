@@ -86,3 +86,5 @@
 - admin 페이지 개발
 - django-jenkins by https://django-jenkins.readthedocs.io/en/latest/
 - social login - kakao, google, apple
+- post comment 기능 추가
+- search 부분 ElasticSearch 활용

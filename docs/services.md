@@ -5,8 +5,8 @@
   4. [DELETE shop/v1/post/:post_id/](#4-delete-shopv1postpost_id)
   5. [GET shop/v1/post/:post_id](#5-get-shopv1postpost_id)
   6. [GET shop/v1/posts/](#6-get-shopv1posts)
-  7. [GET shop/v1/<int:post_id>/want_participate/](#7-get-shopv1intpost_idwant_participate)
-  8. [POST shop/v1/<int:post_id>/participate/](#8-post-shopv1intpost_idparticipate)
+  7. [GET shop/v1/:post_id/want_participate/](#7-get-shopv1intpost_idwant_participate)
+  8. [POST shop/v1/:post_id/participate/](#8-post-shopv1intpost_idparticipate)
 
 ## 1. POST account/signup
 
