@@ -7,7 +7,8 @@ from funding.apps.core.exceptions import (
     DoesNotIncludeStatusError,
     UserAlreadyParticipateError
 )
-from funding.apps.core.components.date import DateComponent
+from funding.apps.core.utils.date import DateComponent
+from model_bakery import baker
 
 
 class ShopModelTests(TestCase):
@@ -46,7 +47,7 @@ class ShopAPITests(APITestCase):
             target_amount=600000
         )
 
-        self.fin_date = DateComponent('2022-07-10')
+        self.fin_date = DateComponent('2023-07-10')
         
         self.post = Post.objects.create(
             poster=self.user,
@@ -222,7 +223,7 @@ class ShopAPITests(APITestCase):
         self.assertEqual(response.data['status'], 'CANNOT_WRITE')
     
     def test_ShopPostDetailView_delete(self):
-        user = User.objects.create_user('user1', 'user1@partner.com', 'user123')
+        user = User.objects.create_user('user1', 'user1@user.com', 'user123')
         utoken = Token.objects.create(user=user)
 
         headers = {
@@ -235,7 +236,7 @@ class ShopAPITests(APITestCase):
             content="fjfjjfjf", 
             item=item, 
             poster_name="jin", 
-            final_date="2023-04-26", 
+            final_date=str(self.fin_date), 
             status="SUCCESS")
         
         uri = f'/shop/v1/post/{post.id}/'
@@ -243,3 +244,52 @@ class ShopAPITests(APITestCase):
         # 204 test
         response = self.client.delete(uri, **headers)
         self.assertEqual(response.status_code, 204)
+
+    def test_ShopPostItemView_get(self):
+        uri = '/shop/v1/post/'
+
+        for i in range(50):
+            item = Item.objects.create(price=10000*(i+1), target_amount=1000000*(i+1))
+            Post.objects.create(
+                poster=self.user,
+                title=f"post{i}", 
+                content=f"fjfjjfjf{i}", 
+                item=item,
+                poster_name=f"jin{i}",
+                final_date=str(self.fin_date),
+                status="FUNDING" if i<35 else "CANCEL")
+        
+        # 200 test
+        response = self.client.get(uri, {
+            "search": "",
+            "order_by": "default",
+            "limit": 10,
+            "offset": 0
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['data']), 10)
+
+        # UNSET_PAGINATION test
+        response = self.client.get(uri, {
+            "search": "",
+            "order_by": "default",
+            "offset": 0
+        })
+        self.assertEqual(response.data['status'], 'UNSET_PAGINATION')
+
+        # NOT_FOUND_REQUIRED_PARAMETER test
+        response = self.client.get(uri, {
+            "search": "",
+            "limit": 10,
+            "offset": 0
+        })
+        self.assertEqual(response.data['status'], 'NOT_FOUND_REQUIRED_PARAMETER')
+
+        # PAGE_OUT_OF_BOUND test
+        response = self.client.get(uri, {
+            "search": "",
+            "order_by": "default",
+            "limit": 10,
+            "offset": 4
+        })
+        self.assertEqual(response.data['status'], 'PAGE_OUT_OF_BOUND')

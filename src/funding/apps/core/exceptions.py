@@ -29,6 +29,36 @@ class CannotWriteError(DjangoValidationError):
         super().__init__(self.message, code)
 
 
+class UnsetPaginationError(DjangoValidationError):
+    """
+    Pagination 쿼리가 없습니다
+    """
+    status = "UNSET_PAGINATION"
+    def __init__(self):
+        self.message = "Pagination 쿼리가 없습니다"
+        super().__init__(self.message)
+
+
+class PageBoundException(DjangoValidationError):
+    """
+    페이지 범위를 벗어났습니다
+    """
+    status = "PAGE_OUT_OF_BOUND"
+    def __init__(self, max_page):
+        self.message = "페이지 범위를 벗어났습니다"
+        super().__init__(self.message, {"max_page": max_page})
+
+
+class NotFoundRequiredParameterError(DjangoValidationError):
+    """
+    필수 Request parameter가 존재하지 않습니다
+    """
+    status = "NOT_FOUND_REQUIRED_PARAMETER"
+    def __init__(self, key):
+        self.message = "필수 Request parameter가 존재하지 않습니다"
+        super().__init__(self.message, {"required": key})
+
+
 # user
 class DoesNotExistedUserPocketError(DjangoValidationError):
     """

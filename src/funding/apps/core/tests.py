@@ -1,6 +1,6 @@
 from django.test import TestCase
 from funding.apps.core.views.response import HttpStatus, GenericResponse
-from .components import date
+from .utils import date
 
 
 class CoreViewTests(TestCase):

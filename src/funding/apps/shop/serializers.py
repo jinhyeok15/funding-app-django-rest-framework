@@ -5,7 +5,7 @@ from funding.apps.user.serializers import UserSerializer
 from .models import *
 from funding.apps.user.models import User
 from drf_yasg.utils import swagger_serializer_method
-from funding.apps.core.components.date import DateComponent
+from funding.apps.core.utils.date import DateComponent
 
 from funding.apps.core.exceptions import CannotWriteError
 
@@ -85,6 +85,7 @@ class ShopPostsReadSerializer(ShopPostMethod, ModelSerializer):
     class Meta:
         model = Post
         fields = [
+            'id',
             'title',
             'poster_name',
             'all_funding_amount',

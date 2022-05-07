@@ -60,9 +60,15 @@ class ShopCRUDMixin:
         펀딩 중인 상품을 삭제할 수 없음
         """
         try:
-            post = Post.objects.get(pk=post_id, status__in=['SUCCESS', 'CLOSE']).delete()
+            Post.objects.get(pk=post_id, status__in=['SUCCESS', 'CLOSE']).delete()
         except ObjectDoesNotExist:
             raise PostDoesNotExistError(post_id)
+    
+    def read_posts(self, search=None):
+        posts = Post.objects.exclude(status='CANCEL')
+        if search:
+            posts = posts.filter(title__startswith=search).exclude(status='CANCEL')
+        return posts
 
 class ShopMixin(
     ShopValidationMixin,

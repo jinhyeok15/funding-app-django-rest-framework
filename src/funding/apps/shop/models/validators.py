@@ -2,7 +2,7 @@ from funding.apps.core.exceptions import (
     # models validation error
     FinalDateValidationError
 )
-from funding.apps.core.components import date
+from funding.apps.core.utils import date
 
 
 # models validation

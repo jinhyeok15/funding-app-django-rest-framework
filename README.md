@@ -30,6 +30,7 @@
 
 * (web) Nginx
 * Docker
+* (cache) redis
 
 ## 주요 개발 부분
 
@@ -37,11 +38,15 @@
 
 * 유저 토큰 기반 인증 구현
 
-* 주석, 설명 상세화, swagger 기반 문서 Schema 작성
+* 주석, 설명 상세화, swagger 기반 문서 Schema 작성 (Customizing)
 
 * unittest 기반 API 개발. 선 test 후 view 작성
 
 * JWT로 settings.py 보안 부분 token화 하여 ini파일로 관리.
+
+* redis로 게시물 조회 부분 캐싱 -> 조회 속도 개선
+
+* 데이터베이스 트랜잭션 처리
 
 ## 제출 필수 사항
 

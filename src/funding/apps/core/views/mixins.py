@@ -1,6 +1,7 @@
 from rest_framework.authtoken.models import Token
 from rest_framework.fields import empty
-from ..exceptions import SerializerValidationError
+from ..exceptions import SerializerValidationError, UnsetPaginationError, NotFoundRequiredParameterError
+from django.utils.datastructures import MultiValueDictKeyError
 
 
 class HeaderMixin:
@@ -30,6 +31,34 @@ class ValidationMixin:
         if szr.is_valid() is False:
             raise SerializerValidationError(f'Not valid serializer {serializer.__name__}', szr.errors)
         return szr
+    
+    def get_query_or_none(self, query, key):
+        """
+        쿼리스트링에서 해당 키로 불러올 수 있는지 여부를 확인 후, 불러올 수 있는 값 return 아니면 None
+        """
+        try:
+            return query[key]
+        except MultiValueDictKeyError:
+            return None
+    
+    def get_query_or_exception(self, query, key):
+        """
+        쿼리스트링에서 해당 키로 불러올 수 있는지 여부 확인 후, 불러올 수 있는 값 return 아니면 NotFoundRequiredParameterError
+        """
+        try:
+            return query[key]
+        except MultiValueDictKeyError:
+            raise NotFoundRequiredParameterError(key)
+    
+    def get_paginate_parameters(self, query):
+        limit = self.get_query_or_none(query, 'limit')
+        offset = self.get_query_or_none(query, 'offset')
+        if limit and offset:
+            limit = int(limit)
+            offset = int(offset)
+            return limit, offset
+        else:
+            raise UnsetPaginationError
 
 
 class CoreMixin(

@@ -72,6 +72,13 @@
 
 + PATCH shop/v1/post/:post_id
 + DELETE shop/v1/post/:post_id
-- GET shop/posts/
 
-- signin API
+## 5.7
+
++ GET shop/posts/
+
+- signin
+- Figure 모델 설계
+- post 생성, 조회 부분 수정
+- 배치 프로그래밍
+- 0 division error validation

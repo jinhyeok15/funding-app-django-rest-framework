@@ -58,5 +58,4 @@ class PostBaseModel(TimeStampBaseModel):
     content = models.TextField()
 
     class Meta:
-        ordering = ['created_at']
         abstract = True

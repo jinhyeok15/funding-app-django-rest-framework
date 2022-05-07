@@ -33,6 +33,7 @@ class Post(PostBaseModel):
         ('CANCEL', '취소'),
         ('CLOSE', '펀딩종료'),
     ])
+    objects = ShopPostManager()
     
     class Meta:
         db_table = 'shop_posts'

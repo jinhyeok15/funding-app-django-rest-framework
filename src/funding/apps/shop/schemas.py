@@ -15,6 +15,12 @@ from funding.apps.core.exceptions import (
 
 AUTH_TOKEN_PARAMETER = Parameter('Authorization', openapi.IN_HEADER, description="유저 토큰 -> Token {your token}", type=openapi.TYPE_STRING)
 POST_ID_PATH_PARAMETER = Parameter("post_id", IN_PATH, required=True, type=TYPE_INTEGER)
+POST_ITEM_READ_PARAMETER = [
+    Parameter("search", IN_QUERY, type=TYPE_STRING, description='검색어, null값 허용'),
+    Parameter("order_by", IN_QUERY, type=TYPE_STRING, description='default(총펀딩금액)/created(생성일)'),
+    Parameter("limit", IN_QUERY, type=TYPE_INTEGER, description='한 페이지당 보여줄 내용 개수'),
+    Parameter("offset", IN_QUERY, type=TYPE_INTEGER, description='페이지 인덱싱. 첫 페이지 0부터')
+]
 
 
 class ShopPostCreateSerializer(Serializer):
@@ -214,5 +220,31 @@ SHOP_POST_DETAIL_DELETE_LOGIC = {
     "responses": {
         204: get_status_by_code(204),
         404: PostDoesNotExistError.status
+    }
+}
+
+
+SHOP_POST_ITEM_READ_LOGIC = {
+    "operation_summary": "펀딩 상품 전체 조회 API",
+    "operation_description": """
+    # 펀딩 상품 전체 조회 API
+
+    ## 개요
+
+    - 제목, 게시자명, 총펀딩금액, 달성률 및 D-day(펀딩 종료일까지) 가 포함되어야 합니다.
+
+    - 상품을 검색하고 정렬합니다. 정렬은 생성일, 총펀딩금액별 정렬이 가능합니다.
+
+    ## 필수요건
+
+    1. 조회는 10개씩 가능 limit=10, offset=n-1(nth page)
+    2. 상품 리스트 API 에 ?search=취미 조회 시 ,제목에  ‘내 취미 만들..’  ‘취미를 위한 ..’ 등 검색한 문자 포함된 상품 리스트만 조회
+    3. 생성일기준의 경우 인덱싱으로 조회 cache에서 가져온 object에서 그대로 pagination
+    4. 총 펀딩금액 기준으로 정렬을 할 경우에는 serializer에서 sorting 해야함
+    5. search 쿼리의 경우, 추후에 AWS ElasticSearch를 활용한다. 참조: http://labs.brandi.co.kr/2021/07/08/leekh.html
+    """,
+    "manual_parameters": POST_ITEM_READ_PARAMETER,
+    "responses": {
+        200: get_status_by_code(200)
     }
 }

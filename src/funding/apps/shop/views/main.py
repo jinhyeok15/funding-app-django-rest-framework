@@ -1,5 +1,4 @@
 from rest_framework.views import APIView
-from uritemplate import partial
 
 # serializers
 from ..serializers import *
@@ -28,6 +27,9 @@ from funding.apps.core.exceptions import (
     PosterCannotParticipateError,
     UserCannotModifyPostError,
     CannotWriteError,
+    UnsetPaginationError,
+    NotFoundRequiredParameterError,
+    PageBoundException
 )
 
 # response
@@ -42,15 +44,22 @@ from .mixins import (
 from funding.apps.core.views.mixins import CoreMixin
 from funding.apps.user.views.mixins import UserMixin
 
+# utils
+from funding.apps.core.utils import sorted_by, get_data_by_page
 
-class ShopPostItemView(
-    ShopMixin,
-    UserMixin,
-    CoreMixin,
-    APIView
-):
+# redis-cache
+from funding.apps.core.utils.backends.cache import (
+    SHOP_POSTS_CREATED_DATA, 
+    SHOP_POSTS_CREATED_DATA_STATUS, 
+    cache, 
+    SHOP_POSTS_DEFAULT_DATA, 
+    SHOP_POSTS_DEFAULT_DATA_STATUS
+)
 
-    permission_classes = [IsAuthenticated]
+
+class ShopPostItemView(ShopMixin, UserMixin, CoreMixin, APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     @swagger_auto_schema(**SHOP_POST_ITEM_CREATE_LOGIC)
     @authorize
@@ -82,14 +91,61 @@ class ShopPostItemView(
             response_body = PostSerializer(post)
 
             return Response(response_body.data, HttpStatus(201, message="생성완료"))
+    
+    @swagger_auto_schema(**SHOP_POST_ITEM_READ_LOGIC)
+    def get(self, request):
+        try:
+            query_string = request.GET
+
+            search, order_by = (
+                self.get_query_or_none(query_string, 'search'),
+                self.get_query_or_exception(query_string, 'order_by'),
+            )
+
+            limit, offset = self.get_paginate_parameters(query_string)
+
+            if order_by == 'default':
+                # sorting에 시간이 소요되므로 default 데이터를 cache에 저장
+                if cache.get(SHOP_POSTS_DEFAULT_DATA_STATUS):
+                    data = cache.get(SHOP_POSTS_DEFAULT_DATA)
+                else:
+                    obj = self.read_posts(search=search)
+                    data = sorted_by(
+                        ShopPostsReadSerializer(obj, many=True).data,
+                        key='all_funding_amount', reverse=True
+                    )
+                    cache.set(SHOP_POSTS_DEFAULT_DATA, data)
+                    cache.set(SHOP_POSTS_DEFAULT_DATA_STATUS, True)
+            elif order_by == 'created':
+                if cache.get(SHOP_POSTS_CREATED_DATA_STATUS):
+                    data = cache.get(SHOP_POSTS_CREATED_DATA)
+                else:
+                    obj = self.read_posts(search=search)
+                    data = sorted_by(
+                        ShopPostsReadSerializer(obj, many=True).data,
+                        key='id', reverse=True
+                    )
+                    cache.set(SHOP_POSTS_CREATED_DATA, data)
+                    cache.set(SHOP_POSTS_CREATED_DATA_STATUS, True)
+            else:
+                raise NotFoundRequiredParameterError('order_by')
+
+            data = get_data_by_page(data, limit, offset)
+        
+        except UnsetPaginationError as e:
+            return Response(None, HttpStatus(400, error=e))
+        
+        except NotFoundRequiredParameterError as e:
+            return Response(None, HttpStatus(400, error=e))
+        
+        except PageBoundException as e:
+            return Response(None, HttpStatus(400, error=e))
+
+        else:
+            return Response(data, HttpStatus(200))
 
 
-class ShopWantParticipateView(
-    ShopMixin,
-    UserMixin,
-    CoreMixin,
-    APIView
-):
+class ShopWantParticipateView(ShopMixin, UserMixin, CoreMixin, APIView):
     
     permission_classes = [IsAuthenticated]
 
@@ -115,11 +171,7 @@ class ShopWantParticipateView(
             return Response({"pocket":response_body.data}, HttpStatus(200, "OK"))
 
 
-class ShopPostParticipateView(
-    ShopMixin,
-    CoreMixin,
-    APIView
-):
+class ShopPostParticipateView(ShopMixin, CoreMixin, APIView):
     
     permission_classes = [IsAuthenticated]
 
@@ -214,7 +266,7 @@ class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
             
             return Response(None, HttpStatus(201, "수정완료"))
 
-    @swagger_auto_schema()
+    @swagger_auto_schema(**SHOP_POST_DETAIL_DELETE_LOGIC)
     @authorize
     def delete(self, request, user_id, post_id):
         try:
