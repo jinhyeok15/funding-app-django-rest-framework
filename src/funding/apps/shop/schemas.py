@@ -10,12 +10,15 @@ from funding.apps.core.exceptions import (
     PosterCannotParticipateError,
     UserAlreadyParticipateError,
     UserCannotModifyPostError,
-    CannotWriteError
+    CannotWriteError,
+    UnsetPaginationError,
+    NotFoundRequiredParameterError,
+    PageBoundException,
 )
 
 AUTH_TOKEN_PARAMETER = Parameter('Authorization', openapi.IN_HEADER, description="유저 토큰 -> Token {your token}", type=openapi.TYPE_STRING)
 POST_ID_PATH_PARAMETER = Parameter("post_id", IN_PATH, required=True, type=TYPE_INTEGER)
-POST_ITEM_READ_PARAMETER = [
+POST_ITEM_READ_PARAMETERS = [
     Parameter("search", IN_QUERY, type=TYPE_STRING, description='검색어, null값 허용'),
     Parameter("order_by", IN_QUERY, type=TYPE_STRING, description='default(총펀딩금액)/created(생성일)'),
     Parameter("limit", IN_QUERY, type=TYPE_INTEGER, description='한 페이지당 보여줄 내용 개수'),
@@ -243,8 +246,11 @@ SHOP_POST_ITEM_READ_LOGIC = {
     4. 총 펀딩금액 기준으로 정렬을 할 경우에는 serializer에서 sorting 해야함
     5. search 쿼리의 경우, 추후에 AWS ElasticSearch를 활용한다. 참조: http://labs.brandi.co.kr/2021/07/08/leekh.html
     """,
-    "manual_parameters": POST_ITEM_READ_PARAMETER,
+    "manual_parameters": POST_ITEM_READ_PARAMETERS,
     "responses": {
-        200: get_status_by_code(200)
+        200: get_status_by_code(200),
+        400: UnsetPaginationError.status,
+        400: NotFoundRequiredParameterError.status,
+        400: PageBoundException.status
     }
 }

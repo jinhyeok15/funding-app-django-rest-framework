@@ -246,7 +246,7 @@ class ShopAPITests(APITestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_ShopPostItemView_get(self):
-        uri = '/shop/v1/post/'
+        uri = '/shop/v1/posts/'
 
         for i in range(50):
             item = Item.objects.create(price=10000*(i+1), target_amount=1000000*(i+1))

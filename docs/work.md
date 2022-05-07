@@ -75,7 +75,7 @@
 
 ## 5.7
 
-+ GET shop/posts/
++ GET shop/v1/posts/
 
 - signin
 - Figure 모델 설계
