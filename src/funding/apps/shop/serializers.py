@@ -6,16 +6,21 @@ from .models import *
 from funding.apps.user.models import User
 from drf_yasg.utils import swagger_serializer_method
 from funding.apps.core.utils.date import DateComponent
+from funding.apps.core.utils.money import money
 
 from funding.apps.core.exceptions import CannotWriteError
 
 
 class ItemSerializer(ModelSerializer):
+    price = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
         fields = '__all__'
         read_only_fields = ['target_amount']
+    
+    def get_price(self, obj) -> str:
+        return str(money(obj.price))
 
 
 class PostSerializer(ModelSerializer):

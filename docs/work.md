@@ -77,8 +77,12 @@
 
 + GET shop/v1/posts/
 
+## 5.10
+
++ item price 조회시 구분쉼표로 표시 -> components.money 자료형 추가
+
 - login
-- Figure 모델 설계
+- PostFigure 모델 설계
 - post 생성, 조회 부분 수정
 - 배치 프로그래밍 by https://cholol.tistory.com/531
 - 0 division error validation

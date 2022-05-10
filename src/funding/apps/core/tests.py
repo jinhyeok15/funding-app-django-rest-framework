@@ -1,6 +1,6 @@
 from django.test import TestCase
 from funding.apps.core.views.response import HttpStatus, GenericResponse
-from .utils import date
+from .utils import date, money
 
 
 class CoreViewTests(TestCase):
@@ -27,7 +27,9 @@ class CoreViewTests(TestCase):
             }
         )
     
-    def test_FinalDateComponent_str_validation(self):
+
+class CoreComponentsTests(TestCase):
+    def test_DateComponent_str_validation(self):
         str_date = "2023-04-05"
         self.assertEqual(str(date.DateComponent(str_date)), str_date)
         str_date = "1997-01-20"
@@ -35,7 +37,7 @@ class CoreViewTests(TestCase):
         str_date = "3340,01,03"
         self.assertRaises(ValueError, date.DateComponent, value=str_date)
     
-    def test_FinalDateComponent_get_d_day(self):
+    def test_DateComponent_get_d_day(self):
         now_date = "2022-05-02"
         str_date = "2022-05-05"
         
@@ -43,3 +45,7 @@ class CoreViewTests(TestCase):
         now = date.DateComponent(now_date)
 
         self.assertEqual((target.as_date()-now.as_date()).days, 3)
+    
+    def test_Money(self):
+        self.assertRaises(ValueError, money.money, value=9)
+        self.assertEqual(str(money.money(19500)), '19,500')
