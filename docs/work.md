@@ -80,15 +80,17 @@
 ## 5.10
 
 + item price 조회시 구분쉼표로 표시 -> components.money 자료형 추가
++ price 관련 serializer method 수정
++ 0 division error validation
 
 - login
 - PostFigure 모델 설계
 - post 생성, 조회 부분 수정
 - 배치 프로그래밍 by https://cholol.tistory.com/531
-- 0 division error validation
 - 정렬시 status 우선 순위 고려, FUNDING->SUCCESS->CLOSE
 - admin 페이지 개발
 - django-jenkins by https://django-jenkins.readthedocs.io/en/latest/
 - social login - kakao, google, apple
 - post comment 기능 추가
 - search 부분 ElasticSearch 활용
+- all_funding_amount로 정렬할 때, compare메소드를 통해 sorting할 것

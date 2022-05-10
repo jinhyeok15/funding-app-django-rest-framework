@@ -1,18 +1,28 @@
-from rest_framework.serializers import Serializer, ModelSerializer
 from rest_framework import serializers
-
+from rest_framework.serializers import Serializer, ModelSerializer
 from funding.apps.user.serializers import UserSerializer
+
 from .models import *
 from funding.apps.user.models import User
+
+# swagger_serializer_method
 from drf_yasg.utils import swagger_serializer_method
-from funding.apps.core.utils.date import DateComponent
+
+# utils
+from funding.apps.core.utils import date
 from funding.apps.core.utils.money import money
 
-from funding.apps.core.exceptions import CannotWriteError
+#exceptions
+from funding.apps.core.exceptions import (
+    CannotWriteError,
+    FinalDateValidationError,
+    TargetAmountBoundException
+)
 
 
 class ItemSerializer(ModelSerializer):
     price = serializers.SerializerMethodField()
+    target_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
@@ -20,7 +30,10 @@ class ItemSerializer(ModelSerializer):
         read_only_fields = ['target_amount']
     
     def get_price(self, obj) -> str:
-        return str(money(obj.price))
+        return money(obj.price).value_of(str)
+    
+    def get_target_amount(self, obj) -> str:
+        return money(obj.target_amount).value_of(str)
 
 
 class PostSerializer(ModelSerializer):
@@ -47,15 +60,15 @@ class ShopPostMethod:
     def get_participant_count(self, obj):
         return obj.participants.count()
 
-    def get_all_funding_amount(self, obj):
-        return obj.item.price * obj.participants.count()
+    def get_all_funding_amount(self, obj) -> str:
+        return money(obj.item.price).times(obj.participants.count()).value_of(str)
     
     def get_d_day(self, obj):
-        final_date_comp = DateComponent(obj.final_date)
+        final_date_comp = date.DateComponent(obj.final_date)
         return final_date_comp.get_d_day()
     
     def get_success_rate(self, obj):
-        all_funding_amount = self.get_all_funding_amount(obj)
+        all_funding_amount = money(self.get_all_funding_amount(obj)).value_of(int)
         target_amount = obj.item.target_amount
         return (all_funding_amount/target_amount) * 100
 
@@ -107,6 +120,17 @@ class ShopPostWriteSerializer(Serializer):
     target_amount = serializers.IntegerField()
     final_date = serializers.CharField()
     price = serializers.IntegerField()
+
+    def validate_final_date(self, value):
+        compare_num = date.DateComponent(value).compare_of(date.get_today())
+        if compare_num != 1:
+            raise FinalDateValidationError(value)
+        return value
+    
+    def validate_target_amount(self, value):
+        if value < 10000:
+            raise TargetAmountBoundException(value)
+        return value
 
     def create(self, validated_data):
         target_amount = validated_data.get('target_amount')

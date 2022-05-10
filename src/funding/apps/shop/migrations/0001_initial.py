@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import funding.apps.shop.models.validators
 
 
 class Migration(migrations.Migration):
@@ -48,7 +47,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=50)),
                 ('content', models.TextField()),
                 ('poster_name', models.CharField(max_length=50)),
-                ('final_date', models.CharField(max_length=25, validators=[funding.apps.shop.models.validators.validate_final_date_component])),
+                ('final_date', models.CharField(max_length=25)),
                 ('status', models.CharField(choices=[('SUCCESS', '성공'), ('FUNDING', '진행중'), ('CANCEL', '취소'), ('CLOSE', '펀딩종료')], default='FUNDING', help_text='\n        SUCCESS는 펀딩이 성공적으로 진행되어 상품 준비단계까지 진행된 상태이며, \n        FUNDING는 펀딩이 진행중인 상태, \n        CLOSE는 펀딩이 종료된 상태, \n        CANCEL는 펀딩 목표 금액을 넘지 못하여 펀딩이 취소된 상태를 의미한다. \n        결제는 DONATE단계에서 진행되며, CANCEL이 되면 결제 내역이 환불된다.\n    ', max_length=12)),
             ],
             options={

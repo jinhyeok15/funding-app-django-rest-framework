@@ -31,10 +31,10 @@ class HttpStatus:
             self.status = None
         self.message = message
         if error is not None:
-            self.message = error.args[0]
-            self.errors = error.args[1]
+            self.message = error.message
+            self.errors = error.params
             try:
-                self.status = error.status
+                self.status = error.code
             except AttributeError:
                 pass
 

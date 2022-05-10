@@ -5,9 +5,11 @@ from .models import *
 from funding.apps.user.models import User, Pocket
 from funding.apps.core.exceptions import (
     DoesNotIncludeStatusError,
-    UserAlreadyParticipateError
+    UserAlreadyParticipateError,
+    TargetAmountBoundException
 )
 from funding.apps.core.utils.date import DateComponent
+from funding.apps.core.utils.money import money
 from model_bakery import baker
 
 
@@ -82,11 +84,18 @@ class ShopAPITests(APITestCase):
         request_data['poster_name'] = ''
         response = self.client.post(uri, request_data, format='json', **self.headers)
         self.assertEqual(response.status_code, 400, "400 serializer error fail")
+        request_data['poster_name'] = '이진혁'
 
         # date관련 에러
-        request_data["final_date"] = "2022-04-25"
+        request_data['final_date'] = '2022-04-25'
         response = self.client.post(uri, request_data, format='json', **self.headers)
         self.assertEqual(response.status_code, 400, "400 date형 관련 에러 fail")
+        request_data['final_date'] = '2023-04-26'
+
+        # Target amount 관련 validation error
+        request_data['target_amount'] = 9999
+        response = self.client.post(uri, request_data, format='json', **self.headers)
+        self.assertEqual(response.data['errors']['target_amount'], TargetAmountBoundException(9999).message)
     
     def test_ShopWantParticipateView_get(self):
         uri = f'/shop/v1/{self.post.id}/want_participate/'
@@ -179,7 +188,7 @@ class ShopAPITests(APITestCase):
         # 200 OK test
         response = self.client.get(uri)
         self.assertEqual(response.data['data']['participant_count'], num)
-        self.assertEqual(response.data['data']['all_funding_amount'], 4500*num)
+        self.assertEqual(response.data['data']['all_funding_amount'], money(4500*num).value_of(str))
         self.assertEqual(response.data['data']['d_day'], self.fin_date.get_d_day())
         self.assertEqual(response.data['data']['success_rate'], (4500*num/600000)*100)
         self.assertEqual(response.status_code, 200)

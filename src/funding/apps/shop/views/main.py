@@ -20,7 +20,7 @@ from django.db import transaction
 # exceptions
 from funding.apps.core.exceptions import (
     PostDoesNotExistError,
-    SerializerValidationError,
+    DjangoValidationError,
     DoesNotExistedUserPocketError,
     UserAlreadyParticipateError,
     PostCannotParticipateError,
@@ -29,7 +29,7 @@ from funding.apps.core.exceptions import (
     CannotWriteError,
     UnsetPaginationError,
     NotFoundRequiredParameterError,
-    PageBoundException
+    PageBoundException,
 )
 
 # response
@@ -77,7 +77,7 @@ class ShopPostItemView(ShopMixin, UserMixin, CoreMixin, APIView):
             )
             post = serializer.save()
 
-        except SerializerValidationError as e:
+        except DjangoValidationError as e:
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
 
@@ -153,7 +153,7 @@ class ShopPostParticipateView(ShopMixin, CoreMixin, APIView):
         except PosterCannotParticipateError as e:
             return Response(None, HttpStatus(400, error=e))
 
-        except SerializerValidationError as e:
+        except DjangoValidationError as e:
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
         
@@ -195,7 +195,7 @@ class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
                 ShopPostWriteSerializer, instance=post, data=request.data, partial=True
             ).save()
 
-        except SerializerValidationError as e:
+        except DjangoValidationError as e:
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
         

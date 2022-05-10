@@ -2,7 +2,7 @@ from drf_yasg import openapi
 from drf_yasg.openapi import *
 from drf_yasg.openapi import Parameter
 from funding.apps.core.views import get_status_by_code, GenericResponse as Response, HttpStatus
-from funding.apps.shop.serializers import *
+from .serializers import *
 from funding.apps.user.serializers import PocketSerializer
 from funding.apps.core.exceptions import (
     DoesNotExistedUserPocketError,
@@ -80,7 +80,7 @@ SHOP_POST_ITEM_CREATE_LOGIC = {
     "responses": {
         201: PostSerializer,
         400: get_status_by_code(400),
-        200: DoesNotExistedUserPocketError.status,
+        200: DoesNotExistedUserPocketError.code,
         401: get_status_by_code(401)
     }
 }
@@ -109,10 +109,10 @@ SHOP_WANT_PARTICIPATE_LOGIC = {
     ],
     "responses": {
         200: PocketSerializer,
-        400: UserAlreadyParticipateError.status,
+        400: UserAlreadyParticipateError.code,
         401: get_status_by_code(401),
-        200: DoesNotExistedUserPocketError.status,
-        400: PosterCannotParticipateError.status
+        200: DoesNotExistedUserPocketError.code,
+        400: PosterCannotParticipateError.code
     }
 }
 
@@ -138,10 +138,10 @@ SHOP_POST_PARTICIPATE_LOGIC = {
     ],
     "responses": {
         200: get_status_by_code(200),
-        200: DoesNotExistedUserPocketError.status,
+        200: DoesNotExistedUserPocketError.code,
         401: get_status_by_code(401),
-        400: UserAlreadyParticipateError.status,
-        400: PosterCannotParticipateError.status
+        400: UserAlreadyParticipateError.code,
+        400: PosterCannotParticipateError.code
     }
 }
 
@@ -166,7 +166,7 @@ SHOP_POST_DETAIL_READ_LOGIC = {
     ],
     "responses": {
         200: ShopPostDetailSerializer,
-        400: PostDoesNotExistError.status
+        400: PostDoesNotExistError.code
     }
 }
 
@@ -193,9 +193,9 @@ SHOP_POST_DETAIL_UPDATE_LOGIC = {
     "responses": {
         201: get_status_by_code(201),
         400: get_status_by_code(400),
-        400: UserCannotModifyPostError.status,
-        404: PostDoesNotExistError.status,
-        400: CannotWriteError.status
+        400: UserCannotModifyPostError.code,
+        404: PostDoesNotExistError.code,
+        400: CannotWriteError.code
     }
 }
 
@@ -222,7 +222,7 @@ SHOP_POST_DETAIL_DELETE_LOGIC = {
     ],
     "responses": {
         204: get_status_by_code(204),
-        404: PostDoesNotExistError.status
+        404: PostDoesNotExistError.code
     }
 }
 
@@ -249,8 +249,8 @@ SHOP_POST_ITEM_READ_LOGIC = {
     "manual_parameters": POST_ITEM_READ_PARAMETERS,
     "responses": {
         200: get_status_by_code(200),
-        400: UnsetPaginationError.status,
-        400: NotFoundRequiredParameterError.status,
-        400: PageBoundException.status
+        400: UnsetPaginationError.code,
+        400: NotFoundRequiredParameterError.code,
+        400: PageBoundException.code
     }
 }

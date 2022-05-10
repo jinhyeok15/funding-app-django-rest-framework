@@ -47,5 +47,11 @@ class CoreComponentsTests(TestCase):
         self.assertEqual((target.as_date()-now.as_date()).days, 3)
     
     def test_Money(self):
-        self.assertRaises(ValueError, money.money, value=9)
-        self.assertEqual(str(money.money(19500)), '19,500')
+        self.assertRaises(ValueError, money.money, value=-1)
+        self.assertEqual(money.money(19500).value_of(str), '19,500')
+        self.assertEqual(money.money(20000).times(3).value_of(str), '60,000')
+        self.assertRaises(ValueError, money.money(999999999).times, num=100)
+
+        self.assertRaises(ValueError, money.money, value='4342.13')
+        self.assertEqual(money.money('3,431,215').value_of(int), 3431215)
+        self.assertRaises(ValueError, money.money, value='33,5678,345,333')
