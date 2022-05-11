@@ -1,6 +1,6 @@
 from rest_framework.authtoken.models import Token
 from rest_framework.fields import empty
-from ..exceptions import DjangoValidationError, UnsetPaginationError, NotFoundRequiredParameterError
+from ..exceptions import SerializerValidationError, UnsetPaginationError, NotFoundRequiredParameterError
 from django.utils.datastructures import MultiValueDictKeyError
 from .response import get_status_by_code
 
@@ -30,7 +30,7 @@ class ValidationMixin:
         szr = serializer(instance=instance, data=data, **kwargs)
 
         if szr.is_valid() is False:
-            raise DjangoValidationError(f'Not valid serializer {serializer.__name__}', code=get_status_by_code(400), params=szr.errors)
+            raise SerializerValidationError(f'Not valid serializer {serializer.__name__}', code=get_status_by_code(400), params=szr.errors)
         return szr
     
     def get_query_or_none(self, query, key):

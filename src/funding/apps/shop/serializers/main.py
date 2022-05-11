@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.serializers import Serializer, ModelSerializer
 from funding.apps.user.serializers import UserSerializer
 
-from .models import *
+from ..models import *
 from funding.apps.user.models import User
 
 # swagger_serializer_method
@@ -18,6 +18,8 @@ from funding.apps.core.exceptions import (
     FinalDateValidationError,
     TargetAmountBoundException
 )
+
+from .validators import *
 
 
 class ItemSerializer(ModelSerializer):
@@ -126,14 +128,10 @@ class ShopPostWriteSerializer(Serializer):
         if compare_num != 1:
             raise FinalDateValidationError(value)
         return value
-    
-    def validate_target_amount(self, value):
-        if value < 10000:
-            raise TargetAmountBoundException(value)
-        return value
 
     def create(self, validated_data):
         target_amount = validated_data.get('target_amount')
+        validate_target_amount(target_amount)
         price = validated_data.get('price')
         item = Item.objects.create(target_amount=target_amount, price=price)
 

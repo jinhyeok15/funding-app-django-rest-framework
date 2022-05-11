@@ -5,8 +5,6 @@ from .models import *
 from funding.apps.user.models import User, Pocket
 from funding.apps.core.exceptions import (
     DoesNotIncludeStatusError,
-    UserAlreadyParticipateError,
-    TargetAmountBoundException
 )
 from funding.apps.core.utils.date import DateComponent
 from funding.apps.core.utils.money import money
@@ -95,7 +93,7 @@ class ShopAPITests(APITestCase):
         # Target amount 관련 validation error
         request_data['target_amount'] = 9999
         response = self.client.post(uri, request_data, format='json', **self.headers)
-        self.assertEqual(response.data['errors']['target_amount'], TargetAmountBoundException(9999).message)
+        self.assertEqual(response.data['status'], 'TARGET_AMOUNT_OUT_OF_BOUND')
     
     def test_ShopWantParticipateView_get(self):
         uri = f'/shop/v1/{self.post.id}/want_participate/'

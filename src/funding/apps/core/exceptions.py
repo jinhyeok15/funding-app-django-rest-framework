@@ -1,5 +1,16 @@
-from rest_framework.serializers import ValidationError as SerializerValidationError
 from django.core.exceptions import ValidationError as DjangoValidationError
+
+
+class SerializerValidationError(DjangoValidationError):
+    """
+    DjangoValidationError를 기반으로 response를 구현하였기 때문에
+    SerializerValidationError 구조도 DjangoValidationError를 따르게 한다
+    """
+    def __init__(self, message=None, code=None, params=None):
+        self.message = message
+        self.code = code
+        self.params = params
+        super().__init__(self.message, code=self.code, params=self.params)
 
 
 class DoesNotIncludeStatusError(KeyError):

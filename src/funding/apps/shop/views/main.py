@@ -20,7 +20,7 @@ from django.db import transaction
 # exceptions
 from funding.apps.core.exceptions import (
     PostDoesNotExistError,
-    DjangoValidationError,
+    SerializerValidationError,
     DoesNotExistedUserPocketError,
     UserAlreadyParticipateError,
     PostCannotParticipateError,
@@ -30,6 +30,7 @@ from funding.apps.core.exceptions import (
     UnsetPaginationError,
     NotFoundRequiredParameterError,
     PageBoundException,
+    TargetAmountBoundException,
 )
 
 # response
@@ -77,11 +78,14 @@ class ShopPostItemView(ShopMixin, UserMixin, CoreMixin, APIView):
             )
             post = serializer.save()
 
-        except DjangoValidationError as e:
+        except SerializerValidationError as e:
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
 
         except DoesNotExistedUserPocketError as e:
+            return Response(None, HttpStatus(200, error=e))
+        
+        except TargetAmountBoundException as e:
             return Response(None, HttpStatus(200, error=e))
         
         else:
@@ -153,7 +157,7 @@ class ShopPostParticipateView(ShopMixin, CoreMixin, APIView):
         except PosterCannotParticipateError as e:
             return Response(None, HttpStatus(400, error=e))
 
-        except DjangoValidationError as e:
+        except SerializerValidationError as e:
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
         
@@ -195,7 +199,7 @@ class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
                 ShopPostWriteSerializer, instance=post, data=request.data, partial=True
             ).save()
 
-        except DjangoValidationError as e:
+        except SerializerValidationError as e:
             transaction.savepoint_rollback(sid)
             return Response(None, HttpStatus(400, error=e))
         
