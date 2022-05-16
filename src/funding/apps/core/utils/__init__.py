@@ -2,8 +2,8 @@ from django.core.paginator import Paginator, EmptyPage
 from ..exceptions import PageBoundException
 
 
-def sorted_by(data, key, reverse=False):
-    return sorted(data, key=lambda x: x[key], reverse=reverse)
+def sorted_by(data, key, reverse=False, **kwargs):
+    return sorted(data, key=lambda x: x[key], reverse=reverse, **kwargs)
 
 def get_data_by_page(data, limit, offset):
     try:

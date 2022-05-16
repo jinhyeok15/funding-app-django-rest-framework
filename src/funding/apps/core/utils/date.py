@@ -44,3 +44,8 @@ class DateComponent:
 
 def get_today():
     return DateComponent(date.today())
+
+def compare_date_from_data(a, b):
+    date_a = DateComponent(a)
+    date_b = DateComponent(b)
+    return date_a.compare_of(date_b)

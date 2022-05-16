@@ -14,6 +14,8 @@ from funding.apps.core.exceptions import (
     UnsetPaginationError,
     NotFoundRequiredParameterError,
     PageBoundException,
+    FinalDateValidationError,
+    TargetAmountBoundException
 )
 
 AUTH_TOKEN_PARAMETER = Parameter('Authorization', openapi.IN_HEADER, description="유저 토큰 -> Token {your token}", type=openapi.TYPE_STRING)
@@ -81,6 +83,8 @@ SHOP_POST_ITEM_CREATE_LOGIC = {
         201: PostSerializer,
         400: get_status_by_code(400),
         200: DoesNotExistedUserPocketError.code,
+        200: TargetAmountBoundException.code,
+        200: FinalDateValidationError.code,
         401: get_status_by_code(401)
     }
 }

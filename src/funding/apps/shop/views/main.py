@@ -31,6 +31,7 @@ from funding.apps.core.exceptions import (
     NotFoundRequiredParameterError,
     PageBoundException,
     TargetAmountBoundException,
+    FinalDateValidationError
 )
 
 # response
@@ -86,6 +87,9 @@ class ShopPostItemView(ShopMixin, UserMixin, CoreMixin, APIView):
             return Response(None, HttpStatus(200, error=e))
         
         except TargetAmountBoundException as e:
+            return Response(None, HttpStatus(200, error=e))
+        
+        except FinalDateValidationError as e:
             return Response(None, HttpStatus(200, error=e))
         
         else:

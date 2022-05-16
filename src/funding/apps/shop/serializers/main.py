@@ -15,8 +15,6 @@ from funding.apps.core.utils.money import money
 #exceptions
 from funding.apps.core.exceptions import (
     CannotWriteError,
-    FinalDateValidationError,
-    TargetAmountBoundException
 )
 
 from .validators import *
@@ -123,15 +121,8 @@ class ShopPostWriteSerializer(Serializer):
     final_date = serializers.CharField()
     price = serializers.IntegerField()
 
-    def validate_final_date(self, value):
-        compare_num = date.DateComponent(value).compare_of(date.get_today())
-        if compare_num != 1:
-            raise FinalDateValidationError(value)
-        return value
-
     def create(self, validated_data):
-        target_amount = validated_data.get('target_amount')
-        validate_target_amount(target_amount)
+        target_amount = validate_target_amount(validated_data.get('target_amount'))
         price = validated_data.get('price')
         item = Item.objects.create(target_amount=target_amount, price=price)
 
@@ -140,6 +131,7 @@ class ShopPostWriteSerializer(Serializer):
         poster_name = validated_data.get('poster_name')
         content = validated_data.get('content')
         final_date = validated_data.get('final_date')
+        validate_final_date(final_date)
         post = Post.objects.create(item=item, poster=poster,
             title=title,
             poster_name=poster_name,
@@ -158,7 +150,7 @@ class ShopPostWriteSerializer(Serializer):
         instance.title = validated_data.get('title', instance.title)
         instance.content = validated_data.get('content', instance.content)
         instance.poster_name = validated_data.get('poster_name', instance.poster_name)
-        instance.final_date = validated_data.get('final_date', instance.final_date)
+        instance.final_date = validate_final_date(validated_data.get('final_date', instance.final_date))
         instance.status = validated_data.get('status', instance.status)
         instance.save()
 

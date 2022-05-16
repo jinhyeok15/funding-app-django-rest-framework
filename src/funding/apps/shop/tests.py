@@ -87,7 +87,8 @@ class ShopAPITests(APITestCase):
         # date관련 에러
         request_data['final_date'] = '2022-04-25'
         response = self.client.post(uri, request_data, format='json', **self.headers)
-        self.assertEqual(response.status_code, 400, "400 date형 관련 에러 fail")
+        self.assertEqual(response.status_code, 200, "200 date형 관련 에러 fail")
+        self.assertEqual(response.data['status'], 'NOT_VALID_DATE_TYPE')
         request_data['final_date'] = '2023-04-26'
 
         # Target amount 관련 validation error
