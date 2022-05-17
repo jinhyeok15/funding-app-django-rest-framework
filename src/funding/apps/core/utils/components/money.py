@@ -1,7 +1,7 @@
-from enum import Enum
+from .base import ComponentBase
 
 
-DEFAULT_CURRENCY = 'WON'
+DEFAULT_CURRENCY_TYPE = 'WON'
 
 
 def _str_currency_to_int(str_curr):
@@ -17,24 +17,27 @@ def _str_currency_to_int(str_curr):
         raise
 
 
-class Money(bytes, Enum):
+class Money(ComponentBase):
 
-    WON = (0, "Won", 0, 9999999999)
+    currency_data = {
+        'WON': {
+            'MIN': 0,
+            'MAX': 9999999999
+        }
+    }
 
-    def __new__(cls, name, cls_name, min_, max_):
-        obj = bytes.__new__(cls, [name])
-        obj._value_ = name
-        obj.cls_name = cls_name
-        obj.min_ = min_
-        obj.max_ = max_
-        return obj
+    def __init__(self, value=None, currency_type=DEFAULT_CURRENCY_TYPE):
+        self.currency = self.currency_data[currency_type]
+        self.MIN = self.currency['MIN']
+        self.MAX = self.currency['MAX']
+        self.__value = value
     
     def __call__(self, value):
         if isinstance(value, str):
             self.__value = _str_currency_to_int(value)
         else:
             self.__value = value
-        if self.__value<self.min_ or self.__value>self.max_:
+        if self.__value<self.MIN or self.__value>self.MAX:
             raise ValueError
         return self
     
@@ -52,13 +55,23 @@ class Money(bytes, Enum):
     def times(self, num):
         return self(self.__value*num)
     
-    def value_of(self, type):
-        if type.__name__=='int':
+    def value_of(self, _type_):
+        if _type_.__name__=='int':
             return self.__value
-        if type.__name__=='str':
+        if _type_.__name__=='str':
             return str(self)
         raise TypeError
+    
+    def compare_of(self, a):
+        if self.__value > a.value_of(int):
+            return 1
+        elif self.__value < a.value_of(int):
+            return -1
+        elif self.__value == a.value_of(int):
+            return 0
+        else:
+            raise ValueError
 
 
 def money(value):
-    return Money[DEFAULT_CURRENCY](value)
+    return Money(DEFAULT_CURRENCY_TYPE)(value)

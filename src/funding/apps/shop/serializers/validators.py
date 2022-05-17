@@ -1,4 +1,4 @@
-from funding.apps.core.utils import date
+from funding.apps.core.utils.components import date
 from funding.apps.core.exceptions import (
     TargetAmountBoundException,
     FinalDateValidationError

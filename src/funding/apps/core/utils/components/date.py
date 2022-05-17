@@ -1,8 +1,9 @@
 from datetime import date
 from typing import Union
+from .base import ComponentBase
 
 
-class DateComponent:
+class DateComponent(ComponentBase):
     def __init__(self, value: Union[str, date]):
         if isinstance(value, str):
             self.__str_date = value
@@ -40,6 +41,13 @@ class DateComponent:
             return -1
         else:
             raise ValueError
+    
+    def value_of(self, _type_):
+        if _type_.__name__=='str':
+            return str(self)
+        if _type_.__name__=='date':
+            return self.__date_value
+        raise TypeError
 
 
 def get_today():

@@ -6,8 +6,8 @@ from funding.apps.user.models import User, Pocket
 from funding.apps.core.exceptions import (
     DoesNotIncludeStatusError,
 )
-from funding.apps.core.utils.date import DateComponent
-from funding.apps.core.utils.money import money
+from funding.apps.core.utils.components import DateComponent, money
+
 from model_bakery import baker
 
 

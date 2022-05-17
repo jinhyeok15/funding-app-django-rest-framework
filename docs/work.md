@@ -85,11 +85,15 @@
 
 ## 5.16
 
-- all_funding_amount로 정렬할 때, compare메소드를 통해 sorting할 것
-  - component의 meta와 base를 만들고, base는 abcmethod로 implement 규격화 시키기
-- 정렬시 status 우선 순위 고려, FUNDING->SUCCESS->CLOSE
-
 + date type에서 sorting관련 함수 임시로 만들고 unittest 통과시키기
+
+## 5.17
+
++ all_funding_amount로 정렬할 때, compare메소드를 통해 sorting할 것
+  + component의 base를 만들고, base는 abcmethod로 implement 규격화 시키기
+
+- 정렬시 status 우선 순위 고려, FUNDING->SUCCESS->CLOSE
+- serializer에서 validated_data를 받기 이전에 validate 함수를 설정할 경우, validate 검증을 하도록 overriding하기
 
 - login
 - PostFigure 모델 설계
@@ -100,5 +104,3 @@
 - social login - kakao, google, apple
 - post comment 기능 추가
 - search 부분 ElasticSearch 활용
-
-

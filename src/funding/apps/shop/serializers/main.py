@@ -9,14 +9,14 @@ from funding.apps.user.models import User
 from drf_yasg.utils import swagger_serializer_method
 
 # utils
-from funding.apps.core.utils import date
-from funding.apps.core.utils.money import money
+from funding.apps.core.utils.components import money, date
 
 #exceptions
 from funding.apps.core.exceptions import (
     CannotWriteError,
 )
 
+# validators for serializer
 from .validators import *
 
 
@@ -56,7 +56,7 @@ class PostBaseSerializer(PostSerializer):
         return UserSerializer(obj.poster).data
 
 
-class ShopPostMethod:
+class ShopPostMixin:
     def get_participant_count(self, obj):
         return obj.participants.count()
 
@@ -73,7 +73,7 @@ class ShopPostMethod:
         return (all_funding_amount/target_amount) * 100
 
 
-class ShopPostDetailSerializer(ShopPostMethod, PostBaseSerializer):
+class ShopPostDetailSerializer(ShopPostMixin, PostBaseSerializer):
     participant_count = serializers.SerializerMethodField()
     all_funding_amount = serializers.SerializerMethodField()
     d_day = serializers.SerializerMethodField()
@@ -95,7 +95,7 @@ class ShopPostDetailSerializer(ShopPostMethod, PostBaseSerializer):
         ]
 
 
-class ShopPostsReadSerializer(ShopPostMethod, ModelSerializer):
+class ShopPostsReadSerializer(ShopPostMixin, ModelSerializer):
     all_funding_amount = serializers.SerializerMethodField()
     d_day = serializers.SerializerMethodField()
     success_rate = serializers.SerializerMethodField()
@@ -130,8 +130,10 @@ class ShopPostWriteSerializer(Serializer):
         title = validated_data.get('title')
         poster_name = validated_data.get('poster_name')
         content = validated_data.get('content')
-        final_date = validated_data.get('final_date')
-        validate_final_date(final_date)
+        final_date = validate_final_date(
+            validated_data.get('final_date')
+        )
+
         post = Post.objects.create(item=item, poster=poster,
             title=title,
             poster_name=poster_name,
