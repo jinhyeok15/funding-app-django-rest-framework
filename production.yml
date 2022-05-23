@@ -3,7 +3,7 @@ version: '3'
 services:
   web:
     restart: always
-    build: ./src
+    build: ./app
     expose:
       - "8000"
     links:

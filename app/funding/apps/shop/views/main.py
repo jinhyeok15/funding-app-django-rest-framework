@@ -61,6 +61,9 @@ from funding.apps.core.utils.backends.cache import (
 
 
 class ShopPostItemView(ShopMixin, UserMixin, CoreMixin, APIView):
+    """
+    v1/post/
+    """
 
     permission_classes = [IsAuthenticated]
 
@@ -103,7 +106,10 @@ class ShopPostItemView(ShopMixin, UserMixin, CoreMixin, APIView):
 
 
 class ShopWantParticipateView(ShopMixin, UserMixin, CoreMixin, APIView):
-    
+    """
+    v1/<int:post_id>/want_participate/
+    """
+
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(**SHOP_WANT_PARTICIPATE_LOGIC)
@@ -129,7 +135,10 @@ class ShopWantParticipateView(ShopMixin, UserMixin, CoreMixin, APIView):
 
 
 class ShopPostParticipateView(ShopMixin, CoreMixin, APIView):
-    
+    """
+    v1/<int:post_id>/participate/
+    """
+
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(**SHOP_POST_PARTICIPATE_LOGIC)
@@ -174,6 +183,9 @@ class ShopPostParticipateView(ShopMixin, CoreMixin, APIView):
 
 
 class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
+    """
+    v1/post/<int:post_id>/
+    """
 
     permission_classes = [AllowAny]
 
@@ -238,6 +250,9 @@ class ShopPostDetailView(CoreMixin, ShopMixin, APIView):
 
 
 class ShopPostsView(ShopMixin, CoreMixin, APIView):
+    """
+    v1/posts/
+    """
 
     permission_classes = [AllowAny]
 
@@ -269,7 +284,7 @@ class ShopPostsView(ShopMixin, CoreMixin, APIView):
                 if cache.get(SHOP_POSTS_CREATED_DATA_STATUS):
                     data = cache.get(SHOP_POSTS_CREATED_DATA)
                 else:
-                    # db에 접근하여 모든 데이터를 read하는 쿼리를 줘야하기에 시간이 오래걸림
+                    # db에 접근하여 모든 데이터를 read하는 쿼리를 줘야하기에 시간이 오래걸림 -> regacy
                     obj = self.read_posts(search=search)
                     data = sorted_by(
                         ShopPostsReadSerializer(obj, many=True).data,

@@ -93,7 +93,6 @@
   + component의 base를 만들고, base는 abcmethod로 implement 규격화 시키기
 
 - 정렬시 status 우선 순위 고려, FUNDING->SUCCESS->CLOSE
-- serializer에서 validated_data를 받기 이전에 validate 함수를 설정할 경우, validate 검증을 하도록 overriding하기
 
 - login
 - PostFigure 모델 설계
@@ -103,4 +102,3 @@
 - django-jenkins by https://django-jenkins.readthedocs.io/en/latest/
 - social login - kakao, google, apple
 - post comment 기능 추가
-- search 부분 ElasticSearch 활용
