@@ -47,8 +47,7 @@ from funding.apps.core.views.mixins import CoreMixin
 from funding.apps.user.views.mixins import UserMixin
 
 # utils
-from funding.apps.core.utils import sorted_by, get_data_by_page
-from funding.apps.core.utils.components import Money
+from funding.apps.core.utils import get_data_by_page
 
 # redis-cache
 from funding.apps.core.utils.backends.cache import (
@@ -274,24 +273,14 @@ class ShopPostsView(ShopMixin, CoreMixin, APIView):
                     data = cache.get(SHOP_POSTS_DEFAULT_DATA)
                 else:
                     obj = self.read_posts(search=search)
-                    data = sorted_by(
-                        ShopPostsReadSerializer(obj, many=True).data,
-                        key='all_funding_amount', component=Money, reverse=True
-                    )
-                    cache.set(SHOP_POSTS_DEFAULT_DATA, data)
-                    cache.set(SHOP_POSTS_DEFAULT_DATA_STATUS, True)
+                    data = ShopPostsReadSerializer.get_sorted_data(obj, order_by)
             elif order_by == 'created':
                 if cache.get(SHOP_POSTS_CREATED_DATA_STATUS):
                     data = cache.get(SHOP_POSTS_CREATED_DATA)
                 else:
                     # db에 접근하여 모든 데이터를 read하는 쿼리를 줘야하기에 시간이 오래걸림 -> regacy
                     obj = self.read_posts(search=search)
-                    data = sorted_by(
-                        ShopPostsReadSerializer(obj, many=True).data,
-                        key='id', reverse=True
-                    )
-                    cache.set(SHOP_POSTS_CREATED_DATA, data)
-                    cache.set(SHOP_POSTS_CREATED_DATA_STATUS, True)
+                    data = ShopPostsReadSerializer.get_sorted_data(obj, order_by)
             else:
                 raise NotFoundRequiredParameterError('order_by')
 

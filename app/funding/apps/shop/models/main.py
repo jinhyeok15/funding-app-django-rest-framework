@@ -38,6 +38,29 @@ class Post(PostBaseModel):
         db_table = 'shop_posts'
 
 
+class PostStatusComponent:
+    ORDER = {
+        'FUNDING': 0,
+        'SUCCESS': 1,
+        'CLOSE': 2,
+        'CANCEL': 4
+    }
+    def __init__(self, value):
+        self.value = value
+        self.order_tag = self.ORDER[self.value]
+    
+    def compare_of(self, a):
+        try:
+            if self.order_tag > a.order_tag:
+                return 1
+            elif self.order_tag < a.order_tag:
+                return -1
+            elif self.order_tag == a.order_tag:
+                return 0
+        except:
+            raise ValueError
+
+
 class Purchase(PurchaseAbstractModel):
     STATUS_CHOICES = [
         ('SUCCESS', '성공'),

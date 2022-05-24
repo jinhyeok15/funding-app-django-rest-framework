@@ -189,7 +189,7 @@ class ShopAPITests(APITestCase):
         self.assertEqual(response.data['data']['participant_count'], num)
         self.assertEqual(response.data['data']['all_funding_amount'], money(4500*num).value_of(str))
         self.assertEqual(response.data['data']['d_day'], self.fin_date.get_d_day())
-        self.assertEqual(response.data['data']['success_rate'], (4500*num/600000)*100)
+        self.assertEqual(response.data['data']['success_rate'], int((4500*num/600000)*100))
         self.assertEqual(response.status_code, 200)
 
         # POST_DOES_NOT_EXIST test
@@ -253,11 +253,20 @@ class ShopAPITests(APITestCase):
         response = self.client.delete(uri, **headers)
         self.assertEqual(response.status_code, 204)
 
-    def test_ShopPostItemView_get(self):
+    def test_ShopPostsView_get(self):
         uri = '/shop/v1/posts/'
 
         for i in range(50):
             item = Item.objects.create(price=10000*(i+1), target_amount=1000000*(i+1))
+            status: str
+            if i<5:
+                status="FUNDING"
+            elif i<8:
+                status="CLOSE"
+            elif i<10:
+                status="SUCCESS"
+            else:
+                status="CANCEL"
             Post.objects.create(
                 poster=self.user,
                 title=f"post{i}", 
@@ -265,17 +274,19 @@ class ShopAPITests(APITestCase):
                 item=item,
                 poster_name=f"jin{i}",
                 final_date=str(self.fin_date),
-                status="FUNDING" if i<35 else "CANCEL")
+                status=status)
         
         # 200 test
         response = self.client.get(uri, {
             "search": "",
-            "order_by": "default",
+            "order_by": "created",
             "limit": 10,
             "offset": 0
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['data']), 10)
+        # sorting test
+        self.assertEqual(response.data['data'][0]['id'], 13)
 
         # UNSET_PAGINATION test
         response = self.client.get(uri, {

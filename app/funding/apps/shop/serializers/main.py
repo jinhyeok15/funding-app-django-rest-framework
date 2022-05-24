@@ -9,15 +9,26 @@ from funding.apps.user.models import User
 from drf_yasg.utils import swagger_serializer_method
 
 # utils
-from funding.apps.core.utils.components import money, date
+from funding.apps.core.utils.components import money, date, Money
+from funding.apps.core.utils import sorted_by
 
 #exceptions
 from funding.apps.core.exceptions import (
     CannotWriteError,
+    NotFoundRequiredParameterError
 )
 
 # validators for serializer
 from .validators import *
+
+# redis-cache
+from funding.apps.core.utils.backends.cache import (
+    SHOP_POSTS_CREATED_DATA, 
+    SHOP_POSTS_CREATED_DATA_STATUS, 
+    cache, 
+    SHOP_POSTS_DEFAULT_DATA, 
+    SHOP_POSTS_DEFAULT_DATA_STATUS
+)
 
 
 class ItemSerializer(ModelSerializer):
@@ -70,7 +81,7 @@ class ShopPostMixin:
     def get_success_rate(self, obj):
         all_funding_amount = money(self.get_all_funding_amount(obj)).value_of(int)
         target_amount = obj.item.target_amount
-        return (all_funding_amount/target_amount) * 100
+        return int((all_funding_amount/target_amount) * 100)
 
 
 class ShopPostDetailSerializer(ShopPostMixin, PostBaseSerializer):
@@ -108,8 +119,34 @@ class ShopPostsReadSerializer(ShopPostMixin, ModelSerializer):
             'poster_name',
             'all_funding_amount',
             'success_rate',
-            'd_day'
+            'd_day',
+            'status'
         ]
+    
+    @classmethod
+    def get_sorted_data(cls, obj, order_by):
+        serializer_data = cls(obj, many=True).data
+        if order_by == 'default':
+            data = sorted_by(
+                serializer_data,
+                key='all_funding_amount', component=Money, reverse=True
+            )
+            cache.set(SHOP_POSTS_DEFAULT_DATA, data)
+            cache.set(SHOP_POSTS_DEFAULT_DATA_STATUS, True)
+        elif order_by == 'created':
+            data = sorted_by(
+                serializer_data,
+                key='id', reverse=True
+            )
+            cache.set(SHOP_POSTS_CREATED_DATA, data)
+            cache.set(SHOP_POSTS_CREATED_DATA_STATUS, True)
+        else:
+            raise NotFoundRequiredParameterError('order_by')
+        
+        data = sorted_by(
+                    data, key='status', component=PostStatusComponent
+                )
+        return data
 
 
 class ShopPostWriteSerializer(Serializer):

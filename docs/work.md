@@ -92,12 +92,16 @@
 + all_funding_amount로 정렬할 때, compare메소드를 통해 sorting할 것
   + component의 base를 만들고, base는 abcmethod로 implement 규격화 시키기
 
-- 정렬시 status 우선 순위 고려, FUNDING->SUCCESS->CLOSE
+## 5.24
 
++ 정렬시 status 우선 순위 고려, FUNDING->SUCCESS->CLOSE
+
+- 배치 프로그래밍 by https://cholol.tistory.com/531
+
+- cashing할 때, search 쿼리가 작동하지 않는 버그 수정하기
 - login
 - PostFigure 모델 설계
 - post 생성, 조회 부분 수정
-- 배치 프로그래밍 by https://cholol.tistory.com/531
 - admin 페이지 개발
 - django-jenkins by https://django-jenkins.readthedocs.io/en/latest/
 - social login - kakao, google, apple
