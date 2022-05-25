@@ -96,9 +96,12 @@
 
 + 정렬시 status 우선 순위 고려, FUNDING->SUCCESS->CLOSE
 
+## 5.25
+
++ cashing할 때, search 쿼리가 작동하지 않는 버그 수정하기
 - 배치 프로그래밍 by https://cholol.tistory.com/531
 
-- cashing할 때, search 쿼리가 작동하지 않는 버그 수정하기
+- settings에 pagination 설정 지정하기
 - login
 - PostFigure 모델 설계
 - post 생성, 조회 부분 수정

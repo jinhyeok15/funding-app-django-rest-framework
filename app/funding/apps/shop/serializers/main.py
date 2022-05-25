@@ -24,10 +24,8 @@ from .validators import *
 # redis-cache
 from funding.apps.core.utils.backends.cache import (
     SHOP_POSTS_CREATED_DATA, 
-    SHOP_POSTS_CREATED_DATA_STATUS, 
     cache, 
     SHOP_POSTS_DEFAULT_DATA, 
-    SHOP_POSTS_DEFAULT_DATA_STATUS
 )
 
 
@@ -132,14 +130,12 @@ class ShopPostsReadSerializer(ShopPostMixin, ModelSerializer):
                 key='all_funding_amount', component=Money, reverse=True
             )
             cache.set(SHOP_POSTS_DEFAULT_DATA, data)
-            cache.set(SHOP_POSTS_DEFAULT_DATA_STATUS, True)
         elif order_by == 'created':
             data = sorted_by(
                 serializer_data,
                 key='id', reverse=True
             )
             cache.set(SHOP_POSTS_CREATED_DATA, data)
-            cache.set(SHOP_POSTS_CREATED_DATA_STATUS, True)
         else:
             raise NotFoundRequiredParameterError('order_by')
         

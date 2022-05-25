@@ -52,10 +52,9 @@ from funding.apps.core.utils import get_data_by_page
 # redis-cache
 from funding.apps.core.utils.backends.cache import (
     SHOP_POSTS_CREATED_DATA, 
-    SHOP_POSTS_CREATED_DATA_STATUS, 
-    cache, 
     SHOP_POSTS_DEFAULT_DATA, 
-    SHOP_POSTS_DEFAULT_DATA_STATUS
+    cache, 
+    get_ordered_cache_data
 )
 
 
@@ -267,22 +266,11 @@ class ShopPostsView(ShopMixin, CoreMixin, APIView):
 
             limit, offset = self.get_paginate_parameters(query_string)
 
-            if order_by == 'default':
-                # sorting에 시간이 소요되므로 default 데이터를 cache에 저장
-                if cache.get(SHOP_POSTS_DEFAULT_DATA_STATUS):
-                    data = cache.get(SHOP_POSTS_DEFAULT_DATA)
-                else:
-                    obj = self.read_posts(search=search)
-                    data = ShopPostsReadSerializer.get_sorted_data(obj, order_by)
-            elif order_by == 'created':
-                if cache.get(SHOP_POSTS_CREATED_DATA_STATUS):
-                    data = cache.get(SHOP_POSTS_CREATED_DATA)
-                else:
-                    # db에 접근하여 모든 데이터를 read하는 쿼리를 줘야하기에 시간이 오래걸림 -> regacy
-                    obj = self.read_posts(search=search)
-                    data = ShopPostsReadSerializer.get_sorted_data(obj, order_by)
-            else:
-                raise NotFoundRequiredParameterError('order_by')
+            data = get_ordered_cache_data(order_by)
+
+            if data is None or search:
+                obj = self.read_posts(search=search)
+                data = ShopPostsReadSerializer.get_sorted_data(obj, order_by)
 
             data = get_data_by_page(data, limit, offset)
         
