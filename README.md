@@ -1,12 +1,10 @@
-# 원티드러닝 프리온보딩 백엔드 2차 코스 지원 과제
+# 펀딩 앱 서버 프로젝트
 
 ## Docs
 
 ### [API 문서](docs/services.md)
 
 ### [Work Logs](docs/work.md)
-
-### [과제 안내](docs/assignment.md)
 
 ## 활용 기술
 
