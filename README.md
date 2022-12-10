@@ -53,6 +53,7 @@ Connect
 ```python manage.py test```
 
 ## 주요 개발 부분
+* View에 세부적인 비즈니스 로직은 Mixin에서 구현하도록 하여 View단에서는 Response 예외처리만 담당하도록 하였음.
 
 * 모델 구조 재사용성을 위한 AbstractModel 활용
 
